@@ -5,13 +5,10 @@ A game in which players can fight using the environment.
 ## AUTHORS
 8INF955 - Video games conception and development (UQAC - University of Québec at Chicoutimi)
 
-Gabriel Rassoul
-Belkacem Lahouel
-Benoît Kessabian
-Donatien Rabiller
+Gabriel Rassoul - Belkacem Lahouel - Benoît Kessabian - Donatien Rabiller
 
 ## HOW DOES IT WORK?
-- Unity3D 5.1.3p3
+- Unity3D 5.2
 - C#
 
 We mainly use those technologies.
