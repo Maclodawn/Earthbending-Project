@@ -3,7 +3,6 @@ using System.Collections;
 
 public class Player_Movement : MonoBehaviour
 {
-    public GameObject m_managerObject;
     Manager m_manager;
     CharacterController m_controller;
 
@@ -45,30 +44,18 @@ public class Player_Movement : MonoBehaviour
 
     public float m_rangeToTakeBullet = 5.0f;
 
-    public string username = "";
+    public string m_username = "";
+
+    private bool m_cursorLocked;
 
     // Use this for initialization
-    void Start()
+    public void init(Manager _manager)
     {
-        m_manager = m_managerObject.GetComponent<Manager>();
+        m_manager = _manager;
+
         m_controller = GetComponent<CharacterController>();
 
         m_currentMoveSpeed = m_runSpeed;
-
-        //         if (!GetComponent<NetworkView>().isMine)
-        //         {
-        //             transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
-        //             transform.position = new Vector3(0, 0, 0);
-        //             GetComponentInChildren<Camera>().enabled = false;
-        //             GetComponentInChildren<MouseLook>().enabled = false;
-        //             GetComponentInChildren<VisorEarth>().enabled = false;
-        //         }
-        //        Network.sendRate = 15;
-        // 
-        //         foreach (GameObject p in (GameObject.FindGameObjectsWithTag("GameController")))
-        //         {
-        //             username = p.GetComponent<Connection>().myName;
-        //         }
 
         m_smoothMovementDodge = m_smoothMovement;
     }
@@ -76,15 +63,20 @@ public class Player_Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //         if (GetComponent<NetworkView>().isMine)
-        //         {
         if (!GetComponentInChildren<InGameMenu>().m_isEscape)
         {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            if (!m_cursorLocked)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+                m_cursorLocked = true;
+            }
         }
-        else
+        else if (m_cursorLocked)
+        {
+            Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+        }
 
         // -------------------------------------Attack1----------------------------------------------
         if (Input.GetButtonDown("Fire1") && m_controller.isGrounded && !m_dodging)
@@ -297,7 +289,7 @@ public class Player_Movement : MonoBehaviour
                 spawnAndFlingBullet();
             else
             {
-                //bullet.setUser(m_id);
+                bullet.setUser(m_username);
                 bullet.fling();
             }
         }
@@ -327,30 +319,31 @@ public class Player_Movement : MonoBehaviour
 
     void spawnAndFlingBullet()
     {
-       Vector3 spawnProjectile = transform.position + transform.forward * m_OffsetForwardEarth + new Vector3(0, m_projOffsetYearth1, 0);
-       BasicRockBullet tmpBullet = ((GameObject)/*Network.*/Instantiate(m_attack1Object, spawnProjectile, Quaternion.identity/*, 0*/)).GetComponent<BasicRockBullet>();
-       tmpBullet.m_spawningHeightOffset = m_projOffsetYearth1;
-       //tmpBullet.setUser(m_id);
+        Vector3 spawnProjectile = transform.position + transform.forward * m_OffsetForwardEarth + new Vector3(0, m_projOffsetYearth1, 0);
+        BasicRockBullet tmpBullet = ((GameObject)Instantiate(m_attack1Object, spawnProjectile, Quaternion.identity)).GetComponent<BasicRockBullet>();
+        tmpBullet.init(m_manager);
+        tmpBullet.m_spawningHeightOffset = m_projOffsetYearth1;
+        tmpBullet.setUser(m_username);
     }
 
     void BasicAttack2()
     {
-//         Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
-//         RaycastHit hit;
-//         if (Physics.Raycast(ray, out hit, 5000))
-//         {
-//             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("WallEarth"))
-//                 print(hit.collider.gameObject.tag);
-//             else
-//             {
-//                 //Vector3 targetDir = hit.point - (transform.position + transform.forward * OffsetForwardEarth + new Vector3(0, projOffsetYearth1, 0));
-//                 //float step = 10 * Time.deltaTime;
-//                 //Vector3 newDir = Vector3.RotateTowards(transform.forward + new Vector3(0, projOffsetYearth1, 0), targetDir, step, 0.0f);
-// //                Network.Instantiate(m_attack2Object, hit.point + new Vector3(0, -3, 0), transform.rotation, 0);
-//                 m_executingAtk2 = true;
-//                 print(hit.collider.gameObject.name);
-//             }
-//         }
+        Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 5000))
+        {
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("WallEarth"))
+                print(hit.collider.gameObject.tag);
+            else
+            {
+//                 Vector3 targetDir = hit.point - (transform.position + transform.forward * m_OffsetForwardEarth + new Vector3(0, m_projOffsetYearth1, 0));
+//                 float step = 10 * Time.deltaTime;
+//                 Vector3 newDir = Vector3.RotateTowards(transform.forward + new Vector3(0, m_projOffsetYearth1, 0), targetDir, step, 0.0f);
+                Instantiate(m_attack2Object, hit.point + new Vector3(0, -3, 0), transform.rotation);
+                m_executingAtk2 = true;
+                print(hit.collider.gameObject.name);
+            }
+        }
     }
 
     void Dodge()
@@ -380,22 +373,4 @@ public class Player_Movement : MonoBehaviour
         else
             m_cooldownBeforeDodgeTimer += Time.deltaTime;
     }
-
-//     void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
-//     {
-//         if (stream.isWriting)
-//         {
-//             positionSend = transform.position;
-//             RotationSend = transform.rotation;
-//             stream.Serialize(ref positionSend);
-//             stream.Serialize(ref RotationSend);
-//         }
-//         else
-//         {
-//             stream.Serialize(ref positionSend);
-//             stream.Serialize(ref RotationSend);
-//             positionReceive = positionSend;
-//             RotationReceive = RotationSend;
-//         }
-//     }
 }

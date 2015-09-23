@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BasicRockBullet : MonoBehaviour {
-
-    public GameObject m_managerObject;
+public class BasicRockBullet : MonoBehaviour
+{
     Manager m_manager;
 
     public Vector3 m_acceleration = Vector3.zero;
@@ -15,7 +14,7 @@ public class BasicRockBullet : MonoBehaviour {
     public float m_forceStabilizer = 10;
     public float m_heightOffset = 0.7f;
 
-    public float m_minDestruction = 3.0f;
+    public float m_minVelocityDestruction = 3.0f;
     public float m_collisionExplosionForce = 50.0f;
     public float m_collisionExplosionRadius = 50.0f;
 
@@ -27,15 +26,17 @@ public class BasicRockBullet : MonoBehaviour {
     bool m_flingDone;
     public bool m_isSpawning { get; set; }
 
+    private Rigidbody m_rigidBody;
+
     public GameObject m_smokeStartToMove;
     public GameObject m_smokeCollide;
 
     public Player_Movement m_user { get; set; }
 
 	// Use this for initialization
-	void Start ()
+	public void init (Manager _manager)
     {
-        m_manager = m_managerObject.GetComponent<Manager>();
+        m_manager = _manager;
         m_manager.m_bulletList.Add(this);
         m_isSpawning = true;
         m_height = transform.position.y;
@@ -45,18 +46,19 @@ public class BasicRockBullet : MonoBehaviour {
         m_applyEarthFriction = true;
         Instantiate(m_smokeStartToMove, transform.position, Quaternion.identity);
         GetComponent<Collider>().enabled = false;
+        m_rigidBody = GetComponent<Rigidbody>();
 	}
 
     void OnCollisionEnter(Collision col)
     {
-        GetComponent<Rigidbody>().AddExplosionForce(m_collisionExplosionForce, GetComponent<Rigidbody>().position, m_collisionExplosionRadius);
+        m_rigidBody.AddExplosionForce(m_collisionExplosionForce, GetComponent<Rigidbody>().position, m_collisionExplosionRadius);
 
-        if (GetComponent<Rigidbody>().velocity.magnitude >= m_minDestruction)
+        if (m_rigidBody.velocity.magnitude >= m_minVelocityDestruction)
         {
             //rigidbody.AddExplosionForce(3.0f, rigidbody.position, 3.0f);
-            Destroy(this.gameObject);
             m_manager.m_bulletList.Remove(this);
             Instantiate(m_smokeCollide, transform.position, Quaternion.identity);
+            Destroy(this.gameObject);
         }
     }
 
@@ -65,7 +67,7 @@ public class BasicRockBullet : MonoBehaviour {
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            /*Network.*/Destroy(this.gameObject);
+            Destroy(this.gameObject);
             m_manager.m_bulletList.Remove(this);
         }
 
@@ -141,24 +143,17 @@ public class BasicRockBullet : MonoBehaviour {
         Instantiate(m_smokeStartToMove, transform.position, Quaternion.identity);
         GetComponent<Collider>().enabled = false;
     }
-
-    //     public void setUser(string _userID)
-    //     {
-    //         GetComponent<NetworkView>().RPC("IsUsedBy", RPCMode.All, _userID);
-    //     }
-    // 
-    //     [RPC]
-    //     void IsUsedBy(string _playerID)
-    //     {
-    //         GameObject[] gos = GameObject.FindGameObjectsWithTag("Player");
-    //         foreach (GameObject go in gos)
-    //         {
-    //             if (go.GetComponent<PlayerMovement>().m_id.Equals(_playerID))
-    //             {
-    //                 m_user = go.GetComponent<PlayerMovement>();
-    //                 break;
-    //             }
-    //         }
-    //         //m_user = GameObject.FindGameObjectWithTag(_playerID).GetComponent<PlayerMovement>();
-    //     }
+    
+    public void setUser(string _playerID)
+    {
+        GameObject[] gos = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject go in gos)
+        {
+            if (go.GetComponent<Player_Movement>().m_username.Equals(_playerID))
+            {
+                m_user = go.GetComponent<Player_Movement>();
+                break;
+            }
+        }
+    }
 }
