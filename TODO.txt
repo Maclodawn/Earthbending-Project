@@ -1,7 +1,3 @@
------------------------------------BUGS
-- L'ennemie peut contrôler mes cailloux qui sont en lévitation
-	Possible FIX: Impossibilité de sélectionner un caillou déjà "linké" à un joueur
-
 ------------------------------------TODO
 - Physique Cailloux:
 	- Manipulation des cailloux ennemies
@@ -11,7 +7,3 @@
 
 - Physique Pilliers:
 	-
-
-------------------------AWKWARDS BUGS
-- Besoin de spawn ensemble ou sinon problème de target
-	Possible FIX: Regarder du côté du réseau

@@ -6,6 +6,7 @@
 [Bb]uil[dt]
 [Ll]ibrary/
 sysinfo.txt
+Assets/UnityVS*
  
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
@@ -19,6 +20,7 @@ sysinfo.txt
 /*.user
 /*.unityproj
 /*.booproj
+.vs
  
 # ============ #
 # OS generated #

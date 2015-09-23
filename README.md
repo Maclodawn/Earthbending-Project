@@ -1,6 +1,6 @@
 # Power of the elements
 
-A game in which players can fight using the environment.
+A game in which players can fight using the environment based on the elements.
 
 ## AUTHORS
 8INF955 - Video games conception and development (UQAC - University of Québec at Chicoutimi)
@@ -8,13 +8,31 @@ A game in which players can fight using the environment.
 Gabriel Rassoul - Belkacem Lahouel - Benoît Kessabian - Donatien Rabiller
 
 ## HOW DOES IT WORK?
-- Unity3D 5.2
+- Unity3D 5.2.0f3
 - C#
 
 We mainly use those technologies.
 
 ## DIRECTORIES
-TODO
+ProjectSettings : Project's settings
+Assets 			: Project's assests
+
+Assets/Materials 		: Project's materials
+Assets/Meshes			: Project's meshes
+Assets/Prefabs			: Project's prefabs
+Assets/Scenes			: Project's scenes
+Assets/Scripts			: Project's scripts
+Assets/Shaders			: Project's shaders
+Assets/Standard Assets	: Unity's standard assets
+Assets/Textures			: Project's textures
+
+Assets/Meshes/Grass			: Grass's mesh
+Assets/Meshes/Projectile	: Projectile's mesh
+
+Assets/Meshes/Projectile/Earth : Projectile's mesh for the earth element
+
+Assets/Textures/RockProj_1	: Rocks' textures
+Assets/Textures/Smoke		: Smoke's texture
 
 ## TECHNICALITIES
 You may add an alias for this repository's address: git remote add [alias_name] [repository_address]
