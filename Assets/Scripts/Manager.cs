@@ -14,6 +14,6 @@ public class Manager : MonoBehaviour
         m_bulletList = new List<BasicRockBullet>();
 
         GameObject player = Instantiate(m_originalPlayer);
-        player.GetComponent<Player_Movement>().init(this);
+        player.GetComponent<CharacterMovement>().init(this);
     }
 }

@@ -1,0 +1,121 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class CharacterMovementEarth : CharacterMovement
+{
+    public float m_OffsetForwardEarth = 1;
+    public float m_projOffsetYEarth1 = -1;
+    float m_timerAttack1 = 0.3f;
+    float m_coolDownAttack1 = 0.3f;
+    public float m_rangeToTakeBullet = 5.0f;
+
+    // Update is called once per frame
+    protected override void Update()
+    {
+        base.Update();
+    }
+
+    protected override void attack()
+    {
+        base.attack();
+
+        if (m_executingAtk1)
+        {
+            m_coolDownAttack1 -= Time.deltaTime;
+            if (m_coolDownAttack1 <= 0)
+            {
+                m_coolDownAttack1 = m_timerAttack1;
+                m_executingAtk1 = false;
+            }
+            else
+            {
+                m_rightSpeed = 0;
+                m_forwardSpeed = 0;
+            }
+        }
+
+        if (m_executingAtk2)
+        {
+            m_coolDownAttack1 -= Time.deltaTime;
+            if (m_coolDownAttack1 <= 0)
+            {
+                m_coolDownAttack1 = m_timerAttack1;
+                m_executingAtk2 = false;
+            }
+            else
+            {
+                m_rightSpeed = 0;
+                m_forwardSpeed = 0;
+            }
+        }
+    }
+
+    protected override void basicAttack1()
+    {
+        m_manager.m_bulletList.RemoveAll(item => item == null);
+        BasicRockBullet bullet = null;
+
+        if (m_manager.m_bulletList.Count > 0)
+        {
+            bullet = findBullet();
+            if (!bullet)
+                spawnAndFlingBullet();
+            else
+            {
+                bullet.setUser(m_username);
+                bullet.fling();
+            }
+        }
+        else
+            spawnAndFlingBullet();
+
+        m_executingAtk1 = true;
+    }
+
+    BasicRockBullet findBullet()
+    {
+        for (int i = 0; i < m_manager.m_bulletList.Count; ++i)
+        {
+            if (m_manager.m_bulletList[i].m_user != null)
+                continue;
+
+            Vector3 positionA = transform.position;
+            Vector3 positionB = m_manager.m_bulletList[i].transform.position;
+            float distance = Mathf.Sqrt(Mathf.Pow(positionA.x - positionB.x, 2) + Mathf.Pow(positionA.y - positionB.y, 2) + Mathf.Pow(positionA.z - positionB.z, 2));
+            if (distance < m_rangeToTakeBullet)
+            {
+                return m_manager.m_bulletList[i];
+            }
+        }
+        return null;
+    }
+
+    void spawnAndFlingBullet()
+    {
+        Vector3 spawnProjectile = transform.position + transform.forward * m_OffsetForwardEarth + new Vector3(0, m_projOffsetYEarth1, 0);
+        BasicRockBullet tmpBullet = ((GameObject)Instantiate(m_attack1Object, spawnProjectile, Quaternion.identity)).GetComponent<BasicRockBullet>();
+        tmpBullet.init(m_manager);
+        tmpBullet.m_spawningHeightOffset = m_projOffsetYEarth1;
+        tmpBullet.setUser(m_username);
+    }
+
+    protected override void basicAttack2()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 5000))
+        {
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("WallEarth"))
+                print(hit.collider.gameObject.tag);
+            else
+            {
+                //                 Vector3 targetDir = hit.point - (transform.position + transform.forward * m_OffsetForwardEarth + new Vector3(0, m_projOffsetYearth1, 0));
+                //                 float step = 10 * Time.deltaTime;
+                //                 Vector3 newDir = Vector3.RotateTowards(transform.forward + new Vector3(0, m_projOffsetYearth1, 0), targetDir, step, 0.0f);
+                Instantiate(m_attack2Object, hit.point + new Vector3(0, -3, 0), transform.rotation);
+                m_executingAtk2 = true;
+                print(hit.collider.gameObject.name);
+            }
+        }
+    }
+}

@@ -6,12 +6,6 @@ public class InGameMenu : MonoBehaviour
 
     public bool m_isEscape = false;
     bool m_isScore = false;
-
-	// Use this for initialization
-	void Start ()
-    {
-	
-	}
 	
 	// Update is called once per frame
 	void Update ()
@@ -29,8 +23,8 @@ public class InGameMenu : MonoBehaviour
     {
         if (m_isEscape)
         {
-            GetComponent<Player_AimPoint>().enabled = false;
-            GetComponent<Player_Look>().enabled = false;
+            GetComponent<PlayerAimPoint>().enabled = false;
+            GetComponent<PlayerLook>().enabled = false;
             if (GUI.Button(new Rect(Screen.width / 2 - 75, Screen.height / 2, 150, 50), "Exit"))
             {
                 Application.Quit();
@@ -38,8 +32,8 @@ public class InGameMenu : MonoBehaviour
         }
         else
         {
-            GetComponent<Player_AimPoint>().enabled = true;
-            GetComponent<Player_Look>().enabled = true;
+            GetComponent<PlayerAimPoint>().enabled = true;
+            GetComponent<PlayerLook>().enabled = true;
         }
 
         if (m_isScore)
@@ -47,7 +41,7 @@ public class InGameMenu : MonoBehaviour
             GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 
             foreach (GameObject p in players)
-                print(p.GetComponent<Player_Movement>().m_username);
+                print(p.GetComponent<CharacterMovement>().m_username);
         }
     }
 }

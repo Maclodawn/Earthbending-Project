@@ -5,9 +5,8 @@ public class BasicRockBullet : MonoBehaviour
 {
     Manager m_manager;
 
-    public Vector3 m_acceleration = Vector3.zero;
-    public Vector3 m_velocity = Vector3.zero;
-
+    public float m_minSpeedStop = 1.0f;
+    public float m_minAngularSpeedStop = 1.0f;
     public float m_earthFriction = 40;
     public float m_forceForward = 3000;
     public float m_forceUp = 500;
@@ -18,40 +17,40 @@ public class BasicRockBullet : MonoBehaviour
     public float m_collisionExplosionForce = 50.0f;
     public float m_collisionExplosionRadius = 50.0f;
 
-    public float m_height { get; set; }
+    float m_height;
     public float m_spawningHeightOffset { get; set; }
-    bool m_applyEarthFriction;
     bool m_risingStarted;
     bool m_risingDone;
     bool m_flingDone;
-    public bool m_isSpawning { get; set; }
+    bool m_isSpawning;
 
     private Rigidbody m_rigidBody;
+    private Collider m_collider;
 
     public GameObject m_smokeStartToMove;
     public GameObject m_smokeCollide;
 
-    public Player_Movement m_user { get; set; }
+    public CharacterMovement m_user { get; set; }
 
 	// Use this for initialization
 	public void init (Manager _manager)
     {
         m_manager = _manager;
         m_manager.m_bulletList.Add(this);
+        m_rigidBody = GetComponent<Rigidbody>();
+        m_collider = GetComponent<Collider>();
         m_isSpawning = true;
         m_height = transform.position.y;
         m_risingDone = false;
         m_risingStarted = false;
         m_flingDone = false;
-        m_applyEarthFriction = true;
         Instantiate(m_smokeStartToMove, transform.position, Quaternion.identity);
-        GetComponent<Collider>().enabled = false;
-        m_rigidBody = GetComponent<Rigidbody>();
+        m_collider.enabled = false;
 	}
 
     void OnCollisionEnter(Collision col)
     {
-        m_rigidBody.AddExplosionForce(m_collisionExplosionForce, GetComponent<Rigidbody>().position, m_collisionExplosionRadius);
+        m_rigidBody.AddExplosionForce(m_collisionExplosionForce, m_rigidBody.position, m_collisionExplosionRadius);
 
         if (m_rigidBody.velocity.magnitude >= m_minVelocityDestruction)
         {
@@ -79,22 +78,22 @@ public class BasicRockBullet : MonoBehaviour
 
         if (!m_risingStarted && !heightReached)
         {
-            GetComponent<Rigidbody>().AddForce(Vector3.up * m_forceUp);
+            m_rigidBody.AddForce(Vector3.up * m_forceUp);
             m_risingStarted = true;
         }
         else if (!m_risingDone && heightReached)
         {
-            GetComponent<Rigidbody>().velocity = new Vector3(GetComponent<Rigidbody>().velocity.x, 0.0f, GetComponent<Rigidbody>().velocity.z);
-            GetComponent<Collider>().enabled = true;
+            m_rigidBody.velocity = new Vector3(m_rigidBody.velocity.x, 0.0f, m_rigidBody.velocity.z);
+            m_collider.enabled = true;
             m_risingDone = true;
         }
-        else if (m_risingDone && !m_flingDone && Input.GetMouseButton(0) && GetComponent<Rigidbody>().velocity.y < 0)
+        else if (m_risingDone && !m_flingDone && Input.GetButton("Fire1") && m_rigidBody.velocity.y < 0)
         {
-            GetComponent<Rigidbody>().AddForce(Vector3.up * m_forceStabilizer);
+            m_rigidBody.AddForce(Vector3.up * m_forceStabilizer);
         }
-        else if (!m_flingDone && m_risingDone && !Input.GetMouseButton(0))
+        else if (!m_flingDone && m_risingDone && !Input.GetButton("Fire1"))
         {
-            GetComponent<Rigidbody>().velocity = new Vector3(GetComponent<Rigidbody>().velocity.x, 0.0f, GetComponent<Rigidbody>().velocity.z);
+            m_rigidBody.velocity = new Vector3(m_rigidBody.velocity.x, 0.0f, m_rigidBody.velocity.z);
 
             Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
             RaycastHit hit;
@@ -106,30 +105,32 @@ public class BasicRockBullet : MonoBehaviour
             Debug.DrawRay(ray.origin, hit.point);
 
             transform.forward = hit.point - transform.position;
-            GetComponent<Rigidbody>().AddForce(transform.forward * m_forceForward);
+            m_rigidBody.AddForce(transform.forward * m_forceForward);
             m_flingDone = true;
 
             m_user = null;
         }
+	}
 
+    void LateUpdate()
+    {
         if (m_risingDone && isGrounded())
         {
-            if (GetComponent<Rigidbody>().velocity.magnitude > 1)
-            {
-                GetComponent<Rigidbody>().AddForce(-GetComponent<Rigidbody>().velocity.normalized * m_earthFriction);
-                m_applyEarthFriction = true;
-            }
-            else if (m_applyEarthFriction)
-            {
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                m_applyEarthFriction = false;
-            }
+            if (m_rigidBody.velocity.magnitude > m_minSpeedStop)
+                m_rigidBody.AddForce(-m_rigidBody.velocity.normalized * m_earthFriction);
+            else
+                m_rigidBody.velocity = Vector3.zero;
+
+            if (m_rigidBody.angularVelocity.magnitude > m_minAngularSpeedStop)
+                m_rigidBody.AddForce(-m_rigidBody.angularVelocity.normalized * m_earthFriction);
+            else
+                m_rigidBody.angularVelocity = Vector3.zero;
         }
-	}
+    }
 
     bool isGrounded()
     {
-        return Physics.Raycast(transform.position, -Vector3.up, GetComponent<Collider>().bounds.extents.y + 0.1f);
+        return Physics.Raycast(transform.position, -Vector3.up, m_collider.bounds.extents.y + 0.1f);
     }
 
     public void fling()
@@ -139,9 +140,8 @@ public class BasicRockBullet : MonoBehaviour
         m_risingDone = false;
         m_risingStarted = false;
         m_flingDone = false;
-        m_applyEarthFriction = true;
         Instantiate(m_smokeStartToMove, transform.position, Quaternion.identity);
-        GetComponent<Collider>().enabled = false;
+        m_collider.enabled = false;
     }
     
     public void setUser(string _playerID)
@@ -149,9 +149,9 @@ public class BasicRockBullet : MonoBehaviour
         GameObject[] gos = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject go in gos)
         {
-            if (go.GetComponent<Player_Movement>().m_username.Equals(_playerID))
+            if (go.GetComponent<CharacterMovement>().m_username.Equals(_playerID))
             {
-                m_user = go.GetComponent<Player_Movement>();
+                m_user = go.GetComponent<CharacterMovement>();
                 break;
             }
         }
