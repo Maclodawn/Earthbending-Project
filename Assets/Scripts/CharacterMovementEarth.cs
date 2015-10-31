@@ -119,9 +119,9 @@ public class CharacterMovementEarth : CharacterMovement
                 //                 Vector3 targetDir = hit.point - (transform.position + transform.forward * m_OffsetForwardEarth + new Vector3(0, m_projOffsetYearth1, 0));
                 //                 float step = 10 * Time.deltaTime;
                 //                 Vector3 newDir = Vector3.RotateTowards(transform.forward + new Vector3(0, m_projOffsetYearth1, 0), targetDir, step, 0.0f);
-                Instantiate(m_attack2Object, hit.point + new Vector3(0, -3, 0), transform.rotation);
+                Quaternion tmp = Quaternion.FromToRotation(transform.up, hit.normal) * Quaternion.FromToRotation(m_attack2Object.transform.forward, transform.forward);
+                Instantiate(m_attack2Object, hit.point + new Vector3(0, -3, 0), tmp);
                 m_executingAtk2 = true;
-                print(hit.collider.gameObject.name);
             }
         }
     }
