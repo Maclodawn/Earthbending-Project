@@ -9,6 +9,8 @@ public class CharacterMovementEarth : CharacterMovement
     float m_coolDownAttack1 = 0.3f;
     public float m_rangeToTakeBullet = 5.0f;
 
+    Collider[] colliderList;
+
     // Update is called once per frame
     protected override void Update()
     {
@@ -52,10 +54,10 @@ public class CharacterMovementEarth : CharacterMovement
 
     protected override void basicAttack1()
     {
-        m_manager.m_bulletList.RemoveAll(item => item == null);
+        colliderList = Physics.OverlapSphere(transform.position, m_rangeToTakeBullet);
         BasicRockBullet bullet = null;
 
-        if (m_manager.m_bulletList.Count > 0)
+        if (colliderList.Length > 0)
         {
             bullet = findBullet();
             if (!bullet)
@@ -74,17 +76,22 @@ public class CharacterMovementEarth : CharacterMovement
 
     BasicRockBullet findBullet()
     {
-        for (int i = 0; i < m_manager.m_bulletList.Count; ++i)
+        for (int i = 0; i < colliderList.Length; ++i)
         {
-            if (m_manager.m_bulletList[i].m_user != null)
-                continue;
+            BasicRockBullet rock = colliderList[i].GetComponent<BasicRockBullet>();
 
-            Vector3 positionA = transform.position;
-            Vector3 positionB = m_manager.m_bulletList[i].transform.position;
-            float distance = Mathf.Sqrt(Mathf.Pow(positionA.x - positionB.x, 2) + Mathf.Pow(positionA.y - positionB.y, 2) + Mathf.Pow(positionA.z - positionB.z, 2));
-            if (distance < m_rangeToTakeBullet)
+            if (rock != null)
             {
-                return m_manager.m_bulletList[i];
+                if (rock.m_user != null)
+                    continue;
+
+                Vector3 positionA = transform.position;
+                Vector3 positionB = rock.transform.position;
+                float distance = Vector3.Distance(positionA, positionB);
+                if (distance < m_rangeToTakeBullet)
+                {
+                    return rock;
+                }
             }
         }
         return null;

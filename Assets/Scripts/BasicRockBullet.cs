@@ -36,7 +36,6 @@ public class BasicRockBullet : MonoBehaviour
 	public void init (Manager _manager)
     {
         m_manager = _manager;
-        m_manager.m_bulletList.Add(this);
         m_rigidBody = GetComponent<Rigidbody>();
         m_collider = GetComponent<Collider>();
         m_isSpawning = true;
@@ -55,7 +54,6 @@ public class BasicRockBullet : MonoBehaviour
         if (m_rigidBody.velocity.magnitude >= m_minVelocityDestruction)
         {
             //rigidbody.AddExplosionForce(3.0f, rigidbody.position, 3.0f);
-            m_manager.m_bulletList.Remove(this);
             Instantiate(m_smokeCollide, transform.position, Quaternion.identity);
             Destroy(this.gameObject);
         }
@@ -67,7 +65,6 @@ public class BasicRockBullet : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A))
         {
             Destroy(this.gameObject);
-            m_manager.m_bulletList.Remove(this);
         }
 
         bool heightReached = false;
