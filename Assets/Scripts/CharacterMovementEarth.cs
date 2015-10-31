@@ -119,8 +119,14 @@ public class CharacterMovementEarth : CharacterMovement
                 //                 Vector3 targetDir = hit.point - (transform.position + transform.forward * m_OffsetForwardEarth + new Vector3(0, m_projOffsetYearth1, 0));
                 //                 float step = 10 * Time.deltaTime;
                 //                 Vector3 newDir = Vector3.RotateTowards(transform.forward + new Vector3(0, m_projOffsetYearth1, 0), targetDir, step, 0.0f);
-                Quaternion tmp = Quaternion.FromToRotation(transform.up, hit.normal) * Quaternion.FromToRotation(m_attack2Object.transform.forward, transform.forward);
-                Instantiate(m_attack2Object, hit.point + new Vector3(0, -3, 0), tmp);
+                Quaternion rotation = Quaternion.FromToRotation(transform.up, hit.normal) * Quaternion.FromToRotation(m_attack2Object.transform.forward, transform.forward);
+                Vector3 newDirection = rotation * m_attack2Object.transform.up;
+
+                float ySize = 0;
+                for (int i = 0; i < m_attack2Object.transform.childCount; ++i)
+                    ySize += m_attack2Object.transform.GetChild(i).GetComponent<MeshRenderer>().bounds.size.y;
+
+                Instantiate(m_attack2Object, hit.point - newDirection * ySize / 2, rotation);
                 m_executingAtk2 = true;
             }
         }

@@ -8,16 +8,21 @@ public class BreakableRockWall : BreakableRock
     public float m_forceUp;
 
     Rigidbody m_rigidbody;
+    BoxCollider m_boxCollider;
 
 	// Use this for initialization
 	void Start ()
     {
         m_rigidbody = GetComponent<Rigidbody>();
+        m_boxCollider = GetComponent<BoxCollider>();
+        m_boxCollider.enabled = false;
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
+        m_boxCollider.enabled = !m_notFrozen;
+
 	    if (m_isSpawning)
         {
             m_rigidbody.AddForce(transform.up * m_forceUp);
