@@ -7,7 +7,9 @@ public class FlingableRock : MonoBehaviour
     public float m_minAngularSpeedStop = 1.0f;
     public float m_earthFriction = 40;
     public float m_forceForward = 3000;
-    public float m_forceUp = 500;
+    public float m_speedForward;
+    public float m_timeToRise;
+    //public float m_forceUp = 500;
     public float m_forceStabilizer = 10;
     public float m_heightOffset = 0.7f;
 
@@ -29,6 +31,29 @@ public class FlingableRock : MonoBehaviour
     public GameObject m_smokeCollide;
 
     public CharacterMovement m_user { get; set; }
+
+    Vector3 m_forward;
+
+    void Awake()
+    {
+        m_rigidBody = GetComponent<Rigidbody>();
+        m_collider = GetComponent<Collider>();
+    }
+
+    // Use this for initialization
+    // init() method has been created instead of Start() method to be able to
+    // initialize the bullet when it is used again by a character
+    public void init()
+    {
+        m_isSpawning = true;
+        m_height = transform.position.y;
+        m_risingDone = false;
+        m_risingStarted = false;
+        m_flingDone = false;
+        Instantiate(m_smokeStartToMove, transform.position, Quaternion.identity);
+        m_collider.enabled = false;
+        //UnityEditor.EditorApplication.isPaused = true;
+    }
 
     protected virtual void OnCollisionEnter(Collision col)
     {
@@ -58,7 +83,8 @@ public class FlingableRock : MonoBehaviour
 
         if (!m_risingStarted && !heightReached)
         {
-            m_rigidBody.AddForce(Vector3.up * m_forceUp);
+            float forceUp = m_rigidBody.mass * m_heightOffset / (m_timeToRise * m_timeToRise);
+            m_rigidBody.AddForce(Vector3.up * forceUp * 2);
             m_risingStarted = true;
         }
         else if (!m_risingDone && heightReached)
@@ -69,10 +95,17 @@ public class FlingableRock : MonoBehaviour
         }
         else if (m_risingDone && !m_flingDone && Input.GetButton("Fire1") && m_rigidBody.velocity.y < 0)
         {
-            m_rigidBody.AddForce(Vector3.up * m_forceStabilizer);
+            float titi = 1 - m_rigidBody.velocity.magnitude;
+            float toto = titi / m_timeToRise;
+            float forceStabilizer = m_rigidBody.mass * toto;
+            m_rigidBody.AddForce(Vector3.up * forceStabilizer * 2);
         }
         else if (!m_flingDone && m_risingDone && !Input.GetButton("Fire1"))
         {
+            Debug.Log("Input.GetButton(\"Fire1\") = " + Input.GetButton("Fire1"));
+            Debug.Log("Input.GetButtonDown(\"Fire1\") = " + Input.GetButtonDown("Fire1"));
+            Debug.Log("Input.GetButtonUp(\"Fire1\") = " + Input.GetButtonUp("Fire1"));
+            
             m_rigidBody.velocity = new Vector3(m_rigidBody.velocity.x, 0.0f, m_rigidBody.velocity.z);
 
             Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
@@ -82,10 +115,18 @@ public class FlingableRock : MonoBehaviour
                 hit.point = ray.direction * 5000;
             }
 
-            Debug.DrawRay(ray.origin, hit.point);
+            if (hit.point != Vector3.zero)
+                Debug.DrawLine(ray.origin, hit.point);
+            else
+                Debug.DrawRay(ray.origin, -Vector3.up);
 
-            transform.forward = hit.point - transform.position;
-            m_rigidBody.AddForce(transform.forward * m_forceForward);
+            //transform.forward = hit.point - transform.position;
+            m_forward = hit.point - transform.position;
+            float distance = Vector3.Distance(ray.origin, hit.point);
+            float forceForward = m_rigidBody.mass * ((m_speedForward - m_rigidBody.velocity.magnitude)
+                                                    * m_speedForward / distance);
+            //m_rigidBody.AddForce(transform.forward * forceForward);
+            m_rigidBody.AddForce(m_forward * forceForward);
             m_flingDone = true;
 
             m_user = null;
@@ -110,7 +151,13 @@ public class FlingableRock : MonoBehaviour
 
     bool isGrounded()
     {
-        return Physics.Raycast(transform.position, -Vector3.up, m_collider.bounds.extents.y + 0.1f);
+        RaycastHit hit;
+        bool result = Physics.Raycast(transform.position, -Vector3.up, out hit, m_collider.bounds.extents.y + 0.1f);
+        if (hit.point != Vector3.zero)
+            Debug.DrawLine(transform.position, hit.point, Color.red);
+        else
+            Debug.DrawRay(transform.position, -Vector3.up, Color.blue);
+        return result;
     }
 
     public void fling()

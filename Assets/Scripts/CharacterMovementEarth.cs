@@ -55,7 +55,7 @@ public class CharacterMovementEarth : CharacterMovement
     protected override void basicAttack1()
     {
         colliderList = Physics.OverlapSphere(transform.position, m_rangeToTakeBullet);
-        BasicRockBullet bullet = null;
+        FlingableRock bullet = null;
 
         if (colliderList.Length > 0)
         {
@@ -74,11 +74,11 @@ public class CharacterMovementEarth : CharacterMovement
         m_executingAtk1 = true;
     }
 
-    BasicRockBullet findBullet()
+    FlingableRock findBullet()
     {
         for (int i = 0; i < colliderList.Length; ++i)
         {
-            BasicRockBullet rock = colliderList[i].GetComponent<BasicRockBullet>();
+            FlingableRock rock = colliderList[i].GetComponent<FlingableRock>();
 
             if (rock != null)
             {
@@ -114,7 +114,10 @@ public class CharacterMovementEarth : CharacterMovement
         {
             Debug.DrawLine(ray.origin, hit.point, Color.red);
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("WallEarth"))
-                print(hit.collider.gameObject.name);
+            {
+                BreakableRockWall breakableRockWall = hit.collider.gameObject.GetComponent<BreakableRockWall>();
+                breakableRockWall.breakRock(m_username);
+            }
             else
             {
                 Quaternion rotation = Quaternion.FromToRotation(transform.up, hit.normal) * Quaternion.FromToRotation(m_attack2Object.transform.forward, transform.forward);
