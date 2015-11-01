@@ -5,7 +5,11 @@ public class BreakableRockWall : BreakableRock
 {
     bool m_isSpawning = true;
     bool m_notFrozen = true;
-    public float m_forceUp;
+    [SerializeField]
+    float m_timeToGoOut;
+
+    float m_ySize;
+    float m_yBaseSize;
 
     Rigidbody m_rigidbody;
     BoxCollider m_boxCollider;
@@ -14,28 +18,46 @@ public class BreakableRockWall : BreakableRock
 	void Start ()
     {
         m_rigidbody = GetComponent<Rigidbody>();
+
         m_boxCollider = GetComponent<BoxCollider>();
         m_boxCollider.enabled = false;
+
+        for (int i = 0; i < transform.childCount; ++i)
+        {
+            Transform tmpTransform = transform.GetChild(i);
+            MeshRenderer tmpMeshRenderer = tmpTransform.GetComponent<MeshRenderer>();
+            if (tmpTransform.gameObject.name.Contains("Base"))
+                m_yBaseSize = tmpMeshRenderer.bounds.size.y;
+            m_ySize += tmpMeshRenderer.bounds.size.y;
+        }
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
-        m_boxCollider.enabled = !m_notFrozen;
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            Destroy(this.gameObject);
+        }
 
 	    if (m_isSpawning)
         {
-            m_rigidbody.AddForce(transform.up * m_forceUp);
+            float forceUp = m_rigidbody.mass * m_ySize / (m_timeToGoOut * m_timeToGoOut);
+            m_rigidbody.AddForce(transform.up * forceUp);
 
             m_isSpawning = false;
         }
-
-        if (m_notFrozen)
+        else if (m_notFrozen)
         {
-            Ray ray = new Ray(transform.position, -transform.up);
+            Ray ray = new Ray(transform.position - transform.up * (m_ySize / 2 - m_yBaseSize), -transform.up);
             RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, 10) && hit.transform.gameObject.name.Contains("Terrain"))
+            bool rayCast = Physics.Raycast(ray, out hit, 10);
+            if (rayCast && hit.transform.gameObject.name.Contains("Terrain"))
+            {
                 m_rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+                m_notFrozen = false;
+                m_boxCollider.enabled = true;
+            }
         }
 	}
 }

@@ -101,7 +101,7 @@ public class CharacterMovementEarth : CharacterMovement
     {
         Vector3 spawnProjectile = transform.position + transform.forward * m_OffsetForwardEarth + new Vector3(0, m_projOffsetYEarth1, 0);
         BasicRockBullet tmpBullet = ((GameObject)Instantiate(m_attack1Object, spawnProjectile, Quaternion.identity)).GetComponent<BasicRockBullet>();
-        tmpBullet.init(m_manager);
+        tmpBullet.init();
         tmpBullet.m_spawningHeightOffset = m_projOffsetYEarth1;
         tmpBullet.setUser(m_username);
     }
@@ -112,21 +112,23 @@ public class CharacterMovementEarth : CharacterMovement
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 5000))
         {
+            Debug.DrawLine(ray.origin, hit.point, Color.red);
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("WallEarth"))
-                print(hit.collider.gameObject.tag);
+                print(hit.collider.gameObject.name);
             else
             {
-                //                 Vector3 targetDir = hit.point - (transform.position + transform.forward * m_OffsetForwardEarth + new Vector3(0, m_projOffsetYearth1, 0));
-                //                 float step = 10 * Time.deltaTime;
-                //                 Vector3 newDir = Vector3.RotateTowards(transform.forward + new Vector3(0, m_projOffsetYearth1, 0), targetDir, step, 0.0f);
                 Quaternion rotation = Quaternion.FromToRotation(transform.up, hit.normal) * Quaternion.FromToRotation(m_attack2Object.transform.forward, transform.forward);
                 Vector3 newDirection = rotation * m_attack2Object.transform.up;
 
                 float ySize = 0;
                 for (int i = 0; i < m_attack2Object.transform.childCount; ++i)
-                    ySize += m_attack2Object.transform.GetChild(i).GetComponent<MeshRenderer>().bounds.size.y;
+                {
+                    MeshRenderer meshRenderer = m_attack2Object.transform.GetChild(i).GetComponent<MeshRenderer>();
+                    ySize += meshRenderer.bounds.size.y;
+                }
 
-                Instantiate(m_attack2Object, hit.point - newDirection * ySize / 2, rotation);
+                Vector3 vect = newDirection * ySize / 2.0f;
+                Instantiate(m_attack2Object, hit.point - vect, rotation);
                 m_executingAtk2 = true;
             }
         }

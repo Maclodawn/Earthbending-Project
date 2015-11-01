@@ -3,8 +3,6 @@ using System.Collections;
 
 public class BasicRockBullet : MonoBehaviour
 {
-    Manager m_manager;
-
     public float m_minSpeedStop = 1.0f;
     public float m_minAngularSpeedStop = 1.0f;
     public float m_earthFriction = 40;
@@ -33,9 +31,10 @@ public class BasicRockBullet : MonoBehaviour
     public CharacterMovement m_user { get; set; }
 
 	// Use this for initialization
-	public void init (Manager _manager)
+    // init() method has been created instead of Start() method to be able to
+    // initialize the bullet when it is used again by a character
+	public void init()
     {
-        m_manager = _manager;
         m_rigidBody = GetComponent<Rigidbody>();
         m_collider = GetComponent<Collider>();
         m_isSpawning = true;
