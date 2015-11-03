@@ -65,7 +65,7 @@ public class BreakableRockWall : BreakableRock
         }
 	}
 
-    public void breakRock(string _username)
+    public void breakRock(string _username, string _buttonToWatch)
     {
         if (transform.childCount <= 1)
             return;
@@ -92,6 +92,6 @@ public class BreakableRockWall : BreakableRock
         FlingableRock flingableRock = gameObject.GetComponent<FlingableRock>();
         Destroy(child.gameObject);
         flingableRock.setUser(_username);
-        flingableRock.fling();
+        flingableRock.fling(_buttonToWatch);
     }
 }

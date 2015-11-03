@@ -4,7 +4,6 @@ using System.Collections;
 public class CharacterMovementEarth : CharacterMovement
 {
     public float m_OffsetForwardEarth = 1;
-    public float m_projOffsetYEarth1 = -1;
     float m_timerAttack1 = 0.3f;
     float m_coolDownAttack1 = 0.3f;
     public float m_rangeToTakeBullet = 5.0f;
@@ -65,7 +64,7 @@ public class CharacterMovementEarth : CharacterMovement
             else
             {
                 bullet.setUser(m_username);
-                bullet.fling();
+                bullet.fling("Fire1");
             }
         }
         else
@@ -76,6 +75,9 @@ public class CharacterMovementEarth : CharacterMovement
 
     FlingableRock findBullet()
     {
+        int closerOne = -1;
+        float closerDist = 0;
+
         for (int i = 0; i < colliderList.Length; ++i)
         {
             FlingableRock rock = colliderList[i].GetComponent<FlingableRock>();
@@ -85,25 +87,37 @@ public class CharacterMovementEarth : CharacterMovement
                 if (rock.m_user != null)
                     continue;
 
-                Vector3 positionA = transform.position;
-                Vector3 positionB = rock.transform.position;
-                float distance = Vector3.Distance(positionA, positionB);
-                if (distance < m_rangeToTakeBullet)
+                float distance = Vector3.Distance(transform.position, rock.transform.position);
+                if (distance < m_rangeToTakeBullet && (closerOne == -1 || closerDist > distance))
                 {
-                    return rock;
+                    closerDist = distance;
+                    closerOne = i;
                 }
             }
         }
-        return null;
+
+        if (closerOne == -1)
+            return null;
+        else
+            return colliderList[closerOne].GetComponent<FlingableRock>();
     }
 
     void spawnAndFlingBullet()
     {
-        Vector3 spawnProjectile = transform.position + transform.forward * m_OffsetForwardEarth + new Vector3(0, m_projOffsetYEarth1, 0);
-        BasicRockBullet tmpBullet = ((GameObject)Instantiate(m_attack1Object, spawnProjectile, Quaternion.identity)).GetComponent<BasicRockBullet>();
-        tmpBullet.init();
-        tmpBullet.m_spawningHeightOffset = m_projOffsetYEarth1;
-        tmpBullet.setUser(m_username);
+        Vector3 spawnProjectile = transform.position + transform.forward * m_OffsetForwardEarth;
+        RaycastHit hit;
+        if (Physics.Raycast(spawnProjectile, -Vector3.up, out hit, 50))
+        {
+            if (m_attack1Object.transform.childCount == 0)
+                return;
+            Transform child = m_attack1Object.transform.GetChild(0);
+            MeshRenderer meshRenderer = child.GetComponent<MeshRenderer>();
+            spawnProjectile = hit.point - new Vector3(0, meshRenderer.bounds.extents.y, 0);
+
+            FlingableRock tmpBullet = ((GameObject)Instantiate(m_attack1Object, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
+            tmpBullet.setUser(m_username);
+            tmpBullet.init("Fire1");
+        }
     }
 
     protected override void basicAttack2()
@@ -112,11 +126,10 @@ public class CharacterMovementEarth : CharacterMovement
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 5000))
         {
-            Debug.DrawLine(ray.origin, hit.point, Color.red);
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("WallEarth"))
             {
                 BreakableRockWall breakableRockWall = hit.collider.gameObject.GetComponent<BreakableRockWall>();
-                breakableRockWall.breakRock(m_username);
+                breakableRockWall.breakRock(m_username, "Fire2");
             }
             else
             {
