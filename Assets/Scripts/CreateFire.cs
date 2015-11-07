@@ -21,7 +21,7 @@ public class CreateFire : MonoBehaviour {
 	}
 
 	public void Update() {
-		Debug.Log(Input.GetKeyDown(KeyCode.P));
+		//Debug.Log(Input.GetKeyDown(KeyCode.P));
 
 		if (m_canDetachFire)
 			return;
@@ -36,7 +36,7 @@ public class CreateFire : MonoBehaviour {
 				m_currentNewFire = Instantiate(FirePrefab);
 
 			m_currentElapsedTime += Time.deltaTime;
-			m_currentNewFire.transform.position = PLAYER.transform.position;
+			m_currentNewFire.transform.position = PLAYER.transform.position + OffsetToPlayer;
 		} else if (m_currentElapsedTime < TIME_TO_CHARGE) {
 				GameObject.Destroy(m_currentNewFire);
 				m_currentNewFire = null;
