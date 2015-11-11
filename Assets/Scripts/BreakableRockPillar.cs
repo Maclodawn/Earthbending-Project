@@ -90,7 +90,7 @@ public class BreakableRockPillar : BreakableRock
             return;
 
         Transform child = transform.GetChild(0);
-        if (!child.name.Contains("WallEarth"))
+        if (!child.name.Contains("PillarEarth"))
             return;
 
         MeshRenderer childMeshRenderer = child.GetComponent<MeshRenderer>();
@@ -106,11 +106,13 @@ public class BreakableRockPillar : BreakableRock
         if (m_pieceList.Count == 0)
             return;
 
-        Object obj = Instantiate(m_pieceList[0], child.position, child.rotation);
+        Object obj = Instantiate(m_pieceList[0], child.position + Vector3.up * 0.1f, child.rotation);
+        m_pieceList.RemoveAt(0);
         GameObject gameObject = (GameObject)obj;
+        gameObject.transform.localScale = transform.localScale;
         FlingableRock flingableRock = gameObject.GetComponent<FlingableRock>();
         Destroy(child.gameObject);
         flingableRock.setUser(_username);
-        flingableRock.fling(_buttonToWatch, _forceUp, _forceForward, true);
+        flingableRock.fling(_buttonToWatch, _forceUp, _forceForward, false);
     }
 }

@@ -88,6 +88,7 @@ public class BreakableRockWall : BreakableRock
             return;
 
         Object obj = Instantiate(m_pieceList[0], child.position + Vector3.up * 0.1f, child.rotation);
+        m_pieceList.RemoveAt(0);
         GameObject gameObject = (GameObject) obj;
         FlingableRock flingableRock = gameObject.GetComponent<FlingableRock>();
         Destroy(child.gameObject);

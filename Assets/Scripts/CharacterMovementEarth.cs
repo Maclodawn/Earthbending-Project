@@ -145,27 +145,37 @@ public class CharacterMovementEarth : CharacterMovement
     {
         Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
         RaycastHit hit = new RaycastHit();
-        if (!Physics.Raycast(ray, out hit, 5000))
-            hit.point = ray.direction * 5000;
+        bool collided = Physics.Raycast(ray, out hit, 5000);
 
-        Debug.DrawLine(ray.origin, hit.point, Color.white);
+        BreakableRock breakableRock = hit.collider.GetComponentInParent<BreakableRock>();
 
-        Vector3 direction = hit.point - transform.position;
-        direction.Normalize();
-
-        RaycastHit hitGround;
+        if (collided && breakableRock != null)
         {
-            Vector3 origin = transform.position + transform.forward * m_OffsetForwardEarth * 4;
-            if (!Physics.Raycast(origin, -Vector3.up, out hitGround, 50))
-                Physics.Raycast(origin, Vector3.up, out hitGround, 50);
+            BreakableRockPillar breakableRockPillar = hit.collider.gameObject.GetComponentInParent<BreakableRockPillar>();
+            breakableRockPillar.breakRock(m_username, "Fire2", m_attack1ForceUp, m_attack1ForceForward);
         }
+        else
+        {
+            if (!collided)
+                hit.point = ray.direction * 5000;
 
-        if (!hitGround.collider.gameObject.name.Contains("Terrain"))
-            return;
+            Vector3 direction = hit.point - transform.position;
+            direction.Normalize();
 
-        Quaternion rotation = Quaternion.FromToRotation(transform.up, hitGround.normal) * Quaternion.FromToRotation(m_attack2Object.transform.forward, transform.forward);
+            RaycastHit hitGround;
+            {
+                Vector3 origin = transform.position + transform.forward * m_OffsetForwardEarth * 4;
+                if (!Physics.Raycast(origin, -Vector3.up, out hitGround, 50))
+                    Physics.Raycast(origin, Vector3.up, out hitGround, 50);
+            }
 
-        Instantiate(m_attack2Object, hitGround.point, rotation);
+            if (!hitGround.collider.gameObject.name.Contains("Terrain"))
+                return;
+
+            Quaternion rotation = Quaternion.FromToRotation(transform.up, hitGround.normal) * Quaternion.FromToRotation(m_attack2Object.transform.forward, transform.forward);
+
+            Instantiate(m_attack2Object, hitGround.point, rotation);
+        }
     }
 
     protected override void basicAttack3()
@@ -177,7 +187,7 @@ public class CharacterMovementEarth : CharacterMovement
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("WallEarth"))
             {
                 BreakableRockWall breakableRockWall = hit.collider.gameObject.GetComponent<BreakableRockWall>();
-                breakableRockWall.breakRock(m_username, "Fire3", m_attack1ForceUp, 4000000);
+                breakableRockWall.breakRock(m_username, "Fire3", m_attack1ForceUp, m_attack1ForceForward);
             }
             else
             {
@@ -196,5 +206,14 @@ public class CharacterMovementEarth : CharacterMovement
                 m_executingAtk3 = true;
             }
         }
+    }
+
+    public GameObject getCurrentGround()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, -Vector3.up, out hit, m_collider.bounds.extents.y + 0.1f))
+            return hit.collider.gameObject;
+        else
+            return null;
     }
 }

@@ -9,8 +9,10 @@
 |	   |__/   \______/ |_______/  \______/ 	|
 \*=========================================*/
 EarthBending :
+	- Rocks' colliders need to be active when getting out of the ground so they push away what is on their way
+	- Every rocks going up in less than x seconds are to be automatically selected, if none one will be created
 	- Changing keys for spawning walls from (right click) to (wheel click + back movement)
-	- Pillar spawning when only wheel click
+	- Vertical pillar spawning when only wheel click
 	- Leaned pillar spawning when (wheel click + forward movement)
 	- Slow down rock until it stops if trying to bend a rock coming towards us
 	- Blow apart rocks once colliding

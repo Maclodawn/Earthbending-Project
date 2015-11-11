@@ -42,12 +42,16 @@ public class CharacterMovement : MonoBehaviour
 
     private bool m_cursorLocked;
 
+    protected Collider m_collider;
+
     // Use this for initialization
     public void init(Manager _manager)
     {
         m_manager = _manager;
 
         m_controller = GetComponent<CharacterController>();
+
+        m_collider = GetComponent<Collider>();
 
         m_currentMoveSpeed = m_runSpeed;
 
