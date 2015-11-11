@@ -151,9 +151,9 @@ public class CharacterMovementEarth : CharacterMovement
 
         RaycastHit hitGround;
         {
-            Vector3 origin = transform.position + transform.forward * m_OffsetForwardEarth;
-            Physics.Raycast(origin, -Vector3.up, out hitGround, 50);
-            Debug.DrawLine(origin, hitGround.point, Color.green);
+            Vector3 origin = transform.position + transform.forward * m_OffsetForwardEarth * 4;
+            if (!Physics.Raycast(origin, -Vector3.up, out hitGround, 50))
+                Physics.Raycast(origin, Vector3.up, out hitGround, 50);
         }
 
         if (!hitGround.collider.gameObject.name.Contains("Terrain"))
@@ -161,8 +161,7 @@ public class CharacterMovementEarth : CharacterMovement
 
         Quaternion rotation = Quaternion.FromToRotation(transform.up, hitGround.normal) * Quaternion.FromToRotation(m_attack3Object.transform.forward, transform.forward);
 
-        GameObject obj = (GameObject) Instantiate(m_attack2Object, hitGround.point, Quaternion.identity/*rotation*/);
-        TestMeshTubeDeformation.deform(obj);
+        Instantiate(m_attack2Object, hitGround.point, rotation);
     }
 
     protected override void basicAttack3()
