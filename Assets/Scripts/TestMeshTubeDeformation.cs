@@ -128,7 +128,7 @@ public class TestMeshTubeDeformation : MonoBehaviour
 
         #region Triangles
         int nbTriangles = nbSides + nbSides + nbSides * 2;
-        int[] triangles = new int[nbTriangles * 3 + 3];
+        int[] triangles = new int[nbTriangles * 3];
 
         // Bottom cap
         int tri = 0;
@@ -148,7 +148,10 @@ public class TestMeshTubeDeformation : MonoBehaviour
         i += 3;
 
         // Top cap
-        //tri++;
+
+        // We need to go for the next triangle as for the Top cap
+        // We will be defining reversed triangles (210 instead of 012 so we want to avoid 100)
+        tri++;
         while (tri < nbSides * 2)
         {
             triangles[i] = tri + 2;
@@ -193,6 +196,13 @@ public class TestMeshTubeDeformation : MonoBehaviour
 
     public static void expand(Mesh mesh, float amount)
     {
+        // Here are 2 possibilities, depending on what we want :
+        // - To save memory and order it :
+        //      delete the old TOP caps and replace it with the new then follow with the old and the new SIDES
+        // - To save memory and keep it as it has been added :
+        //      delete the old TOP caps and shift the old SIDES then follow with the new TOP and SIDES
+        // - To save time, do not bother to delete the old TOP caps as they will not be accessible anymore
+
         mesh.MarkDynamic();
 
         float height = amount;
@@ -200,29 +210,41 @@ public class TestMeshTubeDeformation : MonoBehaviour
         float topRadius = mesh.bounds.extents.x;
         int nbSides = 18/*(mesh.vertexCount / 4) - 1*/;
 
+        // BottomLength = TopLength = SidesLength
         int nbVerticesCap = nbSides + 1;
+        int sidesLength = nbSides * 2 + 1;
+
         #region Vertices
 
-        // bottom + top + sides
-        Vector3[] vertices = new Vector3[mesh.vertexCount + (nbVerticesCap + nbSides * 2 + 1)];
-        for (int j = 0; j < mesh.vertexCount; ++j)
-            vertices[j] = mesh.vertices[j];
+        // old_vertices(=bottom + top + sides) - old_top + top + sides
+        Vector3[] vertices = new Vector3[mesh.vertexCount + nbSides * 2 + 1];
 
-        int vert = mesh.vertexCount;
+        int sidesStart = mesh.vertices.Length - sidesLength;
+        int topStart = sidesStart - nbVerticesCap;        
+
+        for (int j = 0; j < mesh.vertexCount; ++j)
+        {
+            if (j < topStart)
+                vertices[j] = mesh.vertices[j];
+            else if (j >= sidesStart)
+                vertices[j - nbVerticesCap] = mesh.vertices[j];
+        }
+
+        int vert = mesh.vertices.Length - nbVerticesCap;
         float _2pi = Mathf.PI * 2f;
 
-        // Bottom cap
-        vertices[vert++] = new Vector3(0f, 0f, 0f);
-        while (vert <= mesh.vertexCount + nbSides)
-        {
-            float rad = (float)vert / nbSides * _2pi;
-            vertices[vert] = new Vector3(Mathf.Cos(rad) * bottomRadius, 0f, Mathf.Sin(rad) * bottomRadius);
-            vert++;
-        }
+//         // Bottom cap
+//         vertices[vert++] = new Vector3(0f, 0f, 0f);
+//         while (vert <= mesh.vertexCount + nbSides)
+//         {
+//             float rad = (float)vert / nbSides * _2pi;
+//             vertices[vert] = new Vector3(Mathf.Cos(rad) * bottomRadius, 0f, Mathf.Sin(rad) * bottomRadius);
+//             vert++;
+//         }
 
         // Top cap
         vertices[vert++] = new Vector3(0f, height, 0f);
-        while (vert <= mesh.vertexCount + nbSides * 2 + 1)
+        while (vert <= mesh.vertexCount - nbVerticesCap + nbSides * 2 + 1)
         {
             float rad = (float)(vert - nbSides - 1) / nbSides * _2pi;
             vertices[vert] = new Vector3(Mathf.Cos(rad) * topRadius, height, Mathf.Sin(rad) * topRadius);
@@ -244,28 +266,30 @@ public class TestMeshTubeDeformation : MonoBehaviour
         #endregion
 
         #region Normales
-        // Here are 2 possibilities, depending on what we want :
-        // - To save memory, delete the old Top caps
-        // - To save time, do not bother to delete the old Top caps as they will not be accessible anymore
 
-        // bottom + top + sides
+        // old_vertices(=bottom + top + sides) - old_top + top + sides
         Vector3[] normales = new Vector3[vertices.Length];
-        for (int j = 0; j < mesh.normals.Length; ++j)
-            normales[j] = mesh.normals[j];
-        vert = mesh.normals.Length;
-
-        // Bottom cap
-        while (vert <= mesh.vertexCount + nbSides)
+        for (int j = 0; j < mesh.vertexCount; ++j)
         {
-            normales[vert++] = Vector3.down;
+            if (j < topStart)
+                normales[j] = mesh.normals[j];
+            else if (j >= sidesStart)
+                normales[j - nbVerticesCap] = mesh.normals[j];
         }
+        vert = mesh.vertices.Length - nbVerticesCap;
+
+//         // Bottom cap
+//         while (vert <= mesh.vertexCount + nbSides)
+//         {
+//             normales[vert++] = Vector3.down;
+//         }
 
         // Top cap
-        while (vert <= mesh.vertexCount + nbSides * 2 + 1)
+        while (vert <= mesh.vertexCount - nbVerticesCap + nbSides * 2 + 1)
         {
             normales[vert++] = Vector3.up;
         }
-
+        
         // Sides
         v = 0;
         while (vert <= vertices.Length - 4)
@@ -286,22 +310,27 @@ public class TestMeshTubeDeformation : MonoBehaviour
 
         #region UVs
         Vector2[] uvs = new Vector2[vertices.Length];
-        for (int j = 0; j < mesh.uv.Length; ++j)
-            uvs[j] = mesh.uv[j];
+        for (int j = 0; j < mesh.vertexCount; ++j)
+        {
+            if (j < topStart)
+                uvs[j] = mesh.uv[j];
+            else if (j >= sidesStart)
+                uvs[j - nbVerticesCap] = mesh.uv[j];
+        }
+        int u = mesh.vertices.Length - nbVerticesCap;
 
         // Bottom cap
-        int u = mesh.uv.Length;
-        uvs[u++] = new Vector2(0.5f, 0.5f);
-        while (u <= mesh.vertexCount + nbSides)
-        {
-            float rad = (float)u / nbSides * _2pi;
-            uvs[u] = new Vector2(Mathf.Cos(rad) * .5f + .5f, Mathf.Sin(rad) * .5f + .5f);
-            u++;
-        }
+//         uvs[u++] = new Vector2(0.5f, 0.5f);
+//         while (u <= nbSides)
+//         {
+//             float rad = (float)u / nbSides * _2pi;
+//             uvs[u] = new Vector2(Mathf.Cos(rad) * .5f + .5f, Mathf.Sin(rad) * .5f + .5f);
+//             u++;
+//         }
 
         // Top cap
         uvs[u++] = new Vector2(0.5f, 0.5f);
-        while (u <= mesh.vertexCount + nbSides * 2 + 1)
+        while (u <= mesh.vertexCount - nbVerticesCap + nbSides * 2 + 1)
         {
             float rad = (float)u / nbSides * _2pi;
             uvs[u] = new Vector2(Mathf.Cos(rad) * .5f + .5f, Mathf.Sin(rad) * .5f + .5f);
@@ -324,30 +353,48 @@ public class TestMeshTubeDeformation : MonoBehaviour
 
         #region Triangles
         int nbTriangles = nbSides + nbSides + nbSides * 2;
-        int[] triangles = new int[mesh.triangles.Length + nbTriangles * 3 + 3];
-        for (int j = 0; j < mesh.triangles.Length; ++j)
-            triangles[j] = mesh.triangles[j];
+        int[] triangles = new int[(nbTriangles + nbSides * 2) * 3];
 
-        // Bottom cap
-        int tri = mesh.triangles.Length;
-        int i = mesh.triangles.Length;
-        while (tri < mesh.triangles.Length + nbSides - 1)
+        int tri = 0;
+        int i = 0;
+
+        while (tri < nbTriangles)
         {
-            triangles[i] = 0;
-            triangles[i + 1] = tri + 1;
-            triangles[i + 2] = tri + 2;
+            if (tri < nbSides)
+            {
+                triangles[i] = mesh.triangles[i];
+                triangles[i + 1] = mesh.triangles[i + 1];
+                triangles[i + 2] = mesh.triangles[i + 2];
+            }
+            else if (tri >= nbSides * 2 + 1)
+            {
+                triangles[i - nbSides] = mesh.triangles[i];
+                triangles[i - nbSides + 1] = mesh.triangles[i + 1];
+                triangles[i - nbSides + 2] = mesh.triangles[i + 2];
+            }
+            
             tri++;
             i += 3;
         }
-        triangles[i] = 0;
-        triangles[i + 1] = tri + 1;
-        triangles[i + 2] = 1;
-        tri++;
-        i += 3;
+
+//         // Bottom cap
+//         while (tri < nbSides - 1)
+//         {
+//             triangles[i] = 0;
+//             triangles[i + 1] = tri + 1;
+//             triangles[i + 2] = tri + 2;
+//             tri++;
+//             i += 3;
+//         }
+//         triangles[i] = 0;
+//         triangles[i + 1] = tri + 1;
+//         triangles[i + 2] = 1;
+//         tri++;
+//         i += 3;
 
         // Top cap
-        //tri++;
-        while (tri < mesh.triangles.Length + nbSides * 2)
+        tri++;
+        while (tri < mesh.vertices.Length - sidesLength)
         {
             triangles[i] = tri + 2;
             triangles[i + 1] = tri + 1;
@@ -364,7 +411,7 @@ public class TestMeshTubeDeformation : MonoBehaviour
         tri++;
 
         // Sides
-        while (tri <= mesh.triangles.Length + nbTriangles)
+        while (tri <= nbTriangles + nbSides * 2)
         {
             triangles[i] = tri + 2;
             triangles[i + 1] = tri + 1;

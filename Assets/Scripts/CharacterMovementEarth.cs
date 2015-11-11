@@ -161,7 +161,7 @@ public class CharacterMovementEarth : CharacterMovement
 
         Quaternion rotation = Quaternion.FromToRotation(transform.up, hitGround.normal) * Quaternion.FromToRotation(m_attack3Object.transform.forward, transform.forward);
 
-        GameObject obj = (GameObject) Instantiate(m_attack2Object, hitGround.point, rotation);
+        GameObject obj = (GameObject) Instantiate(m_attack2Object, hitGround.point, Quaternion.identity/*rotation*/);
         TestMeshTubeDeformation.deform(obj);
     }
 
