@@ -65,7 +65,7 @@ public class BreakableRockWall : BreakableRock
         }
 	}
 
-    public void breakRock(string _username, string _buttonToWatch)
+    public void breakRock(string _username, string _buttonToWatch, float _forceUp, float _forceForward)
     {
         if (transform.childCount <= 1)
             return;
@@ -87,11 +87,12 @@ public class BreakableRockWall : BreakableRock
         if (m_pieceList.Count == 0)
             return;
 
-        Object obj = Instantiate(m_pieceList[0], child.position, child.rotation);
+        Object obj = Instantiate(m_pieceList[0], child.position + Vector3.up * 0.1f, child.rotation);
         GameObject gameObject = (GameObject) obj;
         FlingableRock flingableRock = gameObject.GetComponent<FlingableRock>();
         Destroy(child.gameObject);
         flingableRock.setUser(_username);
-        flingableRock.fling(_buttonToWatch);
+
+        flingableRock.fling(_buttonToWatch, _forceUp, _forceForward, true);
     }
 }

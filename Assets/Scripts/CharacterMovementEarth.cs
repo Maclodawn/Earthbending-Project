@@ -10,6 +10,11 @@ public class CharacterMovementEarth : CharacterMovement
 
     Collider[] colliderList;
 
+    [SerializeField]
+    float m_attack1ForceUp;
+    [SerializeField]
+    float m_attack1ForceForward;
+
     // Update is called once per frame
     protected override void Update()
     {
@@ -60,15 +65,15 @@ public class CharacterMovementEarth : CharacterMovement
         {
             bullet = findBullet();
             if (!bullet)
-                spawnAndFlingBullet();
+                spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
             else
             {
                 bullet.setUser(m_username);
-                bullet.fling("Fire1");
+                bullet.fling("Fire1", m_attack1ForceUp, m_attack1ForceForward, false);
             }
         }
         else
-            spawnAndFlingBullet();
+            spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
 
         m_executingAtk1 = true;
     }
@@ -102,7 +107,7 @@ public class CharacterMovementEarth : CharacterMovement
             return colliderList[closerOne].GetComponent<FlingableRock>();
     }
 
-    void spawnAndFlingBullet()
+    void spawnAndFlingBullet(string _buttonToWatch, float _forceUp, float _forceForward)
     {
         Vector3 spawnProjectile = transform.position + transform.forward * m_OffsetForwardEarth;
         RaycastHit hit;
@@ -116,7 +121,7 @@ public class CharacterMovementEarth : CharacterMovement
 
             FlingableRock tmpBullet = ((GameObject)Instantiate(m_attack1Object, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
             tmpBullet.setUser(m_username);
-            tmpBullet.init("Fire1");
+            tmpBullet.init(_buttonToWatch, _forceUp, _forceForward);
         }
     }
 
@@ -129,7 +134,7 @@ public class CharacterMovementEarth : CharacterMovement
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("WallEarth"))
             {
                 BreakableRockWall breakableRockWall = hit.collider.gameObject.GetComponent<BreakableRockWall>();
-                breakableRockWall.breakRock(m_username, "Fire2");
+                breakableRockWall.breakRock(m_username, "Fire2", m_attack1ForceUp, 4000000);
             }
             else
             {
