@@ -8,7 +8,7 @@ public class CreateFire : MonoBehaviour {
 	public GameObject FirePrefab;
 	public Vector3 OffsetToPlayer;
 
-	private float TIME_TO_CHARGE = 2.0f; //don't forget to change delta time after start in particle system, if any change here
+	private float TIME_TO_CHARGE = 1.0f; //don't forget to change delta time after start in particle system, if any change here
 	private GameObject PLAYER;
 	private bool KeyDownP = false;
 
