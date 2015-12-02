@@ -1,9 +1,20 @@
-------------------------------------TODO
-- Physique Cailloux:
-	- Manipulation des cailloux ennemies
-	- Manipulation des cailloux visés
-	- Collision avec les joueurs
-	- Destruction par étapes
-
-- Physique Pilliers:
-	-
+/*=========================================*\
+|	 /$$$$$$$$ /$$$$$$  /$$$$$$$   /$$$$$$ 	|
+|	|__  $$__//$$__  $$| $$__  $$ /$$__  $$	|
+|	   | $$  | $$  \ $$| $$  \ $$| $$  \ $$	|
+|	   | $$  | $$  | $$| $$  | $$| $$  | $$	|
+|	   | $$  | $$  | $$| $$  | $$| $$  | $$	|
+|	   | $$  | $$  | $$| $$  | $$| $$  | $$	|
+|	   | $$  |  $$$$$$/| $$$$$$$/|  $$$$$$/	|
+|	   |__/   \______/ |_______/  \______/ 	|
+\*=========================================*/
+EarthBending :
+	- Changing keys for spawning walls from (right click) to (wheel click + back movement)
+	- Pillar spawning when only wheel click
+	- Leaned pillar spawning when (wheel click + forward movement)
+	- Slow down rock until it stops if trying to bend a rock coming towards us
+	- Blow apart rocks once colliding
+	- Super jump if pressing (wheel click + jump)
+	- Bigger forces applied to rocks when landing after a super jump if pressing (left click)
+	- Bigger pillar going out when landing after a super jump if pressing (wheel click)
+	- Crushing when landing after super jump if pressing (wheel click + squat)
