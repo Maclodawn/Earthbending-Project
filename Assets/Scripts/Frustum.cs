@@ -4,7 +4,11 @@ using System.Collections.Generic;
 
 public class Frustum : MonoBehaviour {
 
-	public List<GameObject> objects;
+	private List<GameObject> objects;
+
+	public void Start() {
+		objects = new List<GameObject>();
+	}
 
 	public void OnTriggerExit(Collider collider) {
 		objects.Remove(collider.gameObject);
