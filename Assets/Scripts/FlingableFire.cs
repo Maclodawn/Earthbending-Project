@@ -12,8 +12,8 @@ public class FlingableFire : MonoBehaviour {
 	private bool m_canMoveMyself = false;
 	private GameObject m_myFirstCollider = null;
 	private Collider m_myCollider;
-
-	private static bool Destroying = false;
+	
+	private bool m_colliderTouched = false;
 
 	public void Start() {
 		if (Player == null)
@@ -24,14 +24,12 @@ public class FlingableFire : MonoBehaviour {
 	}
 
 	public void Update() {
-		if (Destroying)
-			Destroy(this.gameObject);
-
 		if (m_myFirstCollider != null) {
 			//gameObject.GetComponentInChildren<ParticleSystem>().transform.localScale *= 1.2f;
 			transform.localScale *= 1.2f;
 			//gameObject.GetComponentInChildren<ParticleSystem>().emissionRate *= 1.2f;
 			gameObject.GetComponentInChildren<ParticleSystem>().startSize *= 1.2f;
+
 			transform.position = new Vector3(transform.position.x, transform.position.y+1.4f, transform.position.z);
 
 			if (m_myCollider == null)
@@ -43,11 +41,10 @@ public class FlingableFire : MonoBehaviour {
 
 			if (myCurrentVolume > myFirstColliderVolume) {
 				Destroy(m_myFirstCollider.gameObject);
-				//Destroy(gameObject);
 			}
 		}
 
-		if (m_canMoveMyself && m_myFirstCollider == null) {
+		if (m_canMoveMyself && m_myFirstCollider == null && !m_colliderTouched) {
 			transform.position += Direction * Time.deltaTime * Speed;
 		} else if (FireCreator.canDetachFire() && !Input.GetKeyDown(KeyCode.P)) {
 			FireCreator.reset();
@@ -56,9 +53,10 @@ public class FlingableFire : MonoBehaviour {
 		}
 	}
 
-	public void OnCollisionEnter(Collision c) {
-		if (m_myFirstCollider == null && !(c.collider.gameObject.name.Contains("Terrain") || c.collider.gameObject.name.Contains("Fire")) && c.collider.gameObject != Player) {
-			m_myFirstCollider = c.collider.gameObject;
+	public void OnTriggerEnter(Collider c) {
+		if (m_myFirstCollider == null && !(c.gameObject.name.Contains("Terrain") || c.gameObject.name.Contains("Fire")) && c.gameObject != Player) {
+			m_myFirstCollider = c.gameObject;
+			m_colliderTouched = true;
 		}
 	}
 }
