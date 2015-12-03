@@ -24,7 +24,6 @@ public class BreakableRockWall : BreakableRock
         m_rigidBody = GetComponent<Rigidbody>();
 
         m_boxCollider = GetComponent<BoxCollider>();
-        m_boxCollider.enabled = false;
 
         for (int i = 0; i < transform.childCount; ++i)
         {
@@ -34,6 +33,10 @@ public class BreakableRockWall : BreakableRock
                 m_yBaseSize = tmpMeshRenderer.bounds.size.y;
             m_ySize += tmpMeshRenderer.bounds.size.y;
         }
+
+        float volume = MeshVolumeHelper.VolumeOfObject(gameObject);
+        // 2700 is the average density of a rock Cf. http://www.les-mathematiques.net/phorum/read.php?2,49845
+        m_rigidBody.mass = volume * 2700;
 	}
 	
 	// Update is called once per frame
@@ -60,7 +63,6 @@ public class BreakableRockWall : BreakableRock
             {
                 m_rigidBody.constraints = RigidbodyConstraints.FreezeAll;
                 m_notFrozen = false;
-                m_boxCollider.enabled = true;
             }
         }
 	}
@@ -95,5 +97,11 @@ public class BreakableRockWall : BreakableRock
         flingableRock.setUser(_username);
 
         flingableRock.fling(_buttonToWatch, _forceUp, _forceForward, true);
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        int toto = 0;
+        toto++;
     }
 }

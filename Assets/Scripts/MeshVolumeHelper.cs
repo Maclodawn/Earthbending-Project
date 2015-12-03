@@ -13,7 +13,24 @@ public static class MeshVolumeHelper
         return (1.0f / 6.0f) * (-v321 + v231 + v312 - v132 - v213 + v123);
     }
 
-    public static float VolumeOfMesh(MeshFilter meshFilter)
+    public static float VolumeOfObject(GameObject gameObject)
+    {
+        MeshFilter[] meshFilters = new MeshFilter[1];
+        
+        meshFilters[0] = gameObject.GetComponent<MeshFilter>();
+        if (meshFilters[0])
+            return VolumeOfMesh(meshFilters[0]);
+
+        meshFilters = gameObject.GetComponentsInChildren<MeshFilter>();
+        float totalVolume = 0;
+        foreach (MeshFilter meshFilter in meshFilters)
+        {
+            totalVolume += VolumeOfMesh(meshFilter);
+        }
+        return totalVolume;
+    }
+
+    private static float VolumeOfMesh(MeshFilter meshFilter)
     {
         Mesh mesh = meshFilter.mesh;
 

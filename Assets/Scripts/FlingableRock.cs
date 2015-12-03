@@ -189,8 +189,8 @@ public class FlingableRock : MonoBehaviour
         {
             string thisName = hit.collider.gameObject.name;
             string thatName = m_user.getCurrentGround().name;
-            Debug.Log("thisName=" + thisName);
-            Debug.Log("thatName=" + thatName);
+//             Debug.Log("thisName=" + thisName);
+//             Debug.Log("thatName=" + thatName);
             return thisName.Contains(thatName);
         }
         return false;
@@ -246,9 +246,7 @@ public class FlingableRock : MonoBehaviour
             }
         }
 
-        float volume = m_size.x * m_size.y * m_size.z;
-        MeshFilter meshFilter = GetComponent<MeshFilter>();
-        volume = MeshVolumeHelper.VolumeOfMesh(meshFilter);
+        float volume = MeshVolumeHelper.VolumeOfObject(gameObject);
         // 2700 is the average density of a rock Cf. http://www.les-mathematiques.net/phorum/read.php?2,49845
         m_rigidBody.mass = volume * 2700;
     }
