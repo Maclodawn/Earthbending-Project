@@ -26,6 +26,9 @@ public class BasicAI : MonoBehaviour {
 	private Frustum[] frustums;
 	private List<GameObject> objects;
 
+	private static float DeltaTime = 0.5f;
+	private float timeCount = 0f;
+
 	public void Start() {
 		frustums = GetComponentsInChildren<Frustum>();
 	}
@@ -33,13 +36,18 @@ public class BasicAI : MonoBehaviour {
 	public void Update() {
 		UpdateFrustum();
 
-		int nbVisible = 0;
-		foreach (GameObject o in objects) {
-			if (IsVisible(o)) ++nbVisible;
+		if (timeCount > DeltaTime) {
+			timeCount = 0f;
+
+			foreach (GameObject o in objects) {
+				if (IsVisible(o) && !IsFriend(o)) {
+					attack1();
+					break;
+				}
+			}
 		}
 
-		Debug.Log("#objects in frustum: " + objects.Count + " visible: " + nbVisible);
-
+		timeCount += Time.deltaTime;
 	}
 
 	private void UpdateFrustum() {
@@ -62,7 +70,7 @@ public class BasicAI : MonoBehaviour {
 		Vector3 direction = (o.transform.position - transform.position);
 
 		RaycastHit hit;
-		bool touched = Physics.Raycast(origin + direction.normalized/2, direction, out hit);
+		bool touched = Physics.Raycast(origin, direction, out hit);
 
 		if (!touched) return false;
 
@@ -80,7 +88,7 @@ public class BasicAI : MonoBehaviour {
 				spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
 			else
 			{
-				bullet.setUser(m_username);
+				//bullet.setUser(this, false);
 				bullet.fling("Fire1", m_attack1ForceUp, m_attack1ForceForward, false);
 			}
 		}
@@ -131,8 +139,12 @@ public class BasicAI : MonoBehaviour {
 			spawnProjectile = hit.point - new Vector3(0, meshRenderer.bounds.extents.y, 0);
 			
 			FlingableRock tmpBullet = ((GameObject)Instantiate(attack1Object, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
-			tmpBullet.setUser(m_username);
+			//tmpBullet.setUser(m_username);
 			tmpBullet.init(_buttonToWatch, _forceUp, _forceForward);
 		}
+	}
+
+	private bool IsFriend(GameObject o) {
+		return o.GetComponent<BasicAI>() == null && o.GetComponent<CharacterMovement>() == null;
 	}
 }
