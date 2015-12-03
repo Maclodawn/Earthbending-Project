@@ -13,7 +13,14 @@ public class BasicAI : MonoBehaviour {
 
 	public void Update() {
 		UpdateFrustum();
-		Debug.Log("#objects in frustum: " + objects.Count);
+
+		int nbVisible = 0;
+		foreach (GameObject o in objects) {
+			if (IsVisible(o)) ++nbVisible;
+		}
+
+		Debug.Log("#objects in frustum: " + objects.Count + " visible: " + nbVisible);
+
 	}
 
 	private void UpdateFrustum() {
@@ -24,8 +31,20 @@ public class BasicAI : MonoBehaviour {
 
 		foreach (Frustum f in frustums) {
 			foreach (GameObject o in f.GetObjects()) {
-				objects.Add(o);
+				if (!objects.Contains(o)) objects.Add(o);
 			}
 		}
+	}
+
+	// be careful, if center node of objects are not visible, it is not visible
+	// main interest: detect if another AI is visible or not
+	private bool IsVisible(GameObject o) {
+		Vector3 origin = transform.position; //better use head position
+		Vector3 direction = (o.transform.position - transform.position);
+
+		RaycastHit hit;
+		Physics.Raycast(origin + direction.normalized/2, direction, out hit);
+
+		return hit.collider.gameObject == o;
 	}
 }
