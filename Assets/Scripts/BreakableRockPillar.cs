@@ -25,7 +25,7 @@ public class BreakableRockPillar : BreakableRock
         m_rigidBody = GetComponent<Rigidbody>();
 
         m_boxCollider = transform.GetComponentInChildren<BoxCollider>();
-        m_boxCollider.enabled = false;
+        Physics.IgnoreCollision(m_boxCollider, Manager.getManager().m_terrain.GetComponent<Collider>());
 
         for (int i = 0; i < transform.childCount; ++i)
         {
@@ -52,6 +52,10 @@ public class BreakableRockPillar : BreakableRock
         float z = m_size.z / 4;
         float xz = Mathf.Sqrt(x * x + z * z);
         transform.position -= m_forwardOut * Mathf.Sqrt(y * y + xz * xz);
+
+        float volume = MeshVolumeHelper.VolumeOfObject(gameObject);
+        // 2700 is the average density of a rock Cf. http://www.les-mathematiques.net/phorum/read.php?2,49845
+        m_rigidBody.mass = volume * 2700;
     }
 
     // Update is called once per frame
@@ -79,7 +83,6 @@ public class BreakableRockPillar : BreakableRock
             {
                 m_rigidBody.constraints = RigidbodyConstraints.FreezeAll;
                 m_notFrozen = false;
-                m_boxCollider.enabled = true;
             }
         }
     }

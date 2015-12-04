@@ -104,10 +104,11 @@ public class FlingableRock : MonoBehaviour
             m_isUnderground = Physics.Raycast(m_collider.bounds.center, Vector3.up, out hit, 50)
                               && hit.collider.gameObject.name.Contains("Terrain");
 
-            m_collider.enabled = !m_isUnderground;
-
             if (!m_isUnderground && m_wasUnderground)
+            {
                 Instantiate(m_smokeStartToMove, transform.position, Quaternion.identity);
+                Physics.IgnoreLayerCollision(gameObject.layer, Manager.getManager().m_terrain.gameObject.layer, false);
+            }
         }
 
         if (!m_risingStarted && !heightReached)
