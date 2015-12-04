@@ -110,7 +110,7 @@ public class BreakableRockPillar : BreakableRock
         GameObject gameObject = (GameObject)obj;
         FlingableRock flingableRock = gameObject.GetComponent<FlingableRock>();
         Destroy(child.gameObject);
-        flingableRock.setUser(_username);
+        //flingableRock.setUser(_username);
         flingableRock.fling(_buttonToWatch, _forceUp, _forceForward, true);
     }
 }

@@ -66,7 +66,10 @@ public class FlingableRock : MonoBehaviour
         m_risingDone = false;
         m_flingDone = false;
         m_isUnderground = true;
-        m_heightToReach = m_user.transform.position.y + m_size.y;
+        if (m_user != null)
+			m_heightToReach = m_user.transform.position.y + m_size.y;
+		else
+			m_heightToReach = 1f + m_size.y;
         m_forceUp = _forceUp;
         m_forceForward = _forceForward;
     }
@@ -192,24 +195,29 @@ public class FlingableRock : MonoBehaviour
 
         updateSize();
 
-        if (_heightReached || m_user.transform.position.y < transform.position.y && !isGrounded())
+        if (_heightReached || (m_user != null && m_user.transform.position.y < transform.position.y) && !isGrounded())
             m_heightToReach = transform.position.y;
         else
             m_heightToReach = transform.position.y + m_size.y;
     }
 
-    public void setUser(string _playerID)
+    /*public void setUser(string _playerID)
     {
         GameObject[] gos = GameObject.FindGameObjectsWithTag("Player");
-        foreach (GameObject go in gos)
+
+		foreach (GameObject go in gos)
         {
-            if (go.GetComponent<CharacterMovement>().m_username.Equals(_playerID))
-            {
-                m_user = go.GetComponent<CharacterMovementEarth>();
-                break;
-            }
+			if (go.GetComponent<CharacterMovement>() != null && go.GetComponent<CharacterMovement>().m_username.Equals(_playerID)) {
+				m_user = go.GetComponent<CharacterMovementEarth>();
+				break;
+			}
         }
-    }
+    }*/
+
+	/*if (go.GetComponent<BasicAI>() != null && go.GetComponent<CharacterMovement>().m_username.Equals(_playerID)) {
+		m_user = go.GetComponent<CharacterMovementEarth>();
+		break;
+	}*/
 
     void updateSize()
     {
@@ -257,8 +265,14 @@ public class FlingableRock : MonoBehaviour
 
     float getDistanceRatio()
     {
-        float ratio = m_user.m_OffsetForwardEarth / Vector3.Distance(transform.position, m_user.transform.position);
-        return Mathf.Min(2 * ratio, 1);
+		if(m_user == null)
+			Debug.Log("lol");
+		else
+		{
+			float ratio = m_user.m_OffsetForwardEarth / Vector3.Distance(transform.position, m_user.transform.position);
+			return Mathf.Min(2 * ratio, 1);
+		}
+		return 0;
     }
 
     void setStateAvailable()

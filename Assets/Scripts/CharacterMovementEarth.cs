@@ -84,7 +84,7 @@ public class CharacterMovementEarth : CharacterMovement
                 spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
             else
             {
-                bullet.setUser(m_username);
+                //bullet.setUser(m_username);
                 bullet.fling("Fire1", m_attack1ForceUp, m_attack1ForceForward, false);
             }
         }
@@ -136,7 +136,7 @@ public class CharacterMovementEarth : CharacterMovement
             spawnProjectile = hit.point - new Vector3(0, meshRenderer.bounds.extents.y, 0);
 
             FlingableRock tmpBullet = ((GameObject)Instantiate(m_attack1Object, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
-            tmpBullet.setUser(m_username);
+            //tmpBullet.setUser(m_username);
             tmpBullet.init(_buttonToWatch, _forceUp, _forceForward);
         }
     }
