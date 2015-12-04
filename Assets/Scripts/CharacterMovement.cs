@@ -250,13 +250,12 @@ public class CharacterMovement : MonoBehaviour
             if (Input.GetButtonDown("Fire1"))
                 basicAttack1();
 
-            if (Input.GetButtonDown("Fire2"))
-                basicAttack2();
-
             if (Input.GetButtonDown("Fire3"))
             {
                 if (Input.GetKey(KeyCode.S))
                     basicAttack4();
+                else if (Input.GetKey(KeyCode.Z))
+                    basicAttack2();
                 else
                     basicAttack3();
             }
