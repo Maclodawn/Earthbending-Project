@@ -120,7 +120,14 @@ public class CharacterMovementEarth : CharacterMovement
         if (closerOne == -1)
             return null;
         else
-            return colliderList[closerOne].GetComponent<FlingableRock>();
+        {
+            FlingableRock flingableRock = colliderList[closerOne].GetComponent<FlingableRock>();
+
+            if (flingableRock.canRiseInMinTime(0.30f, this))
+                return flingableRock;
+
+            return null;
+        }
     }
 
     void spawnAndFlingBullet(string _buttonToWatch, float _forceUp, float _forceForward)

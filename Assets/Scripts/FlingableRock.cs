@@ -9,7 +9,6 @@ public class FlingableRock : MonoBehaviour
     float m_forceForward;
     float m_forceUp;
     public float m_forceStabilizer;
-    public float m_timeMinToRise;
 
     Vector3 m_gravityForce;
     Vector3 m_size;
@@ -197,6 +196,21 @@ public class FlingableRock : MonoBehaviour
         return false;
     }
 
+    bool isOnTheSameGroundOfTheUser(CharacterMovementEarth _user)
+    {
+        RaycastHit hit;
+        if (_user != null
+            && Physics.Raycast(m_collider.bounds.center, -Vector3.up, out hit, m_collider.bounds.extents.y + 0.1f))
+        {
+            string thisName = hit.collider.gameObject.name;
+            string thatName = _user.getCurrentGround().name;
+            //             Debug.Log("thisName=" + thisName);
+            //             Debug.Log("thatName=" + thatName);
+            return thisName.Contains(thatName);
+        }
+        return false;
+    }
+
     public void fling(string _buttonToWatch, float _forceUp, float _forceForward, bool _heightReached)
     {
         m_buttonToWatch = _buttonToWatch;
@@ -278,6 +292,12 @@ public class FlingableRock : MonoBehaviour
         return Mathf.Min(4 * ratio, 1);
     }
 
+    float getDistanceRatio(CharacterMovementEarth _user)
+    {
+        float ratio = _user.m_OffsetForwardEarth / Vector3.Distance(transform.position, _user.transform.position);
+        return Mathf.Min(4 * ratio, 1);
+    }
+
     void setStateAvailable()
     {
         m_heightToReach = transform.position.y;
@@ -285,5 +305,29 @@ public class FlingableRock : MonoBehaviour
         m_risingDone = true;
         m_flingDone = true;
         m_user = null;
+    }
+
+    public bool canRiseInMinTime(float timeToRise, CharacterMovementEarth user)
+    {
+        if (!isOnTheSameGroundOfTheUser())
+            m_heightToReach = transform.position.y;
+        else
+            m_heightToReach = transform.position.y + m_size.y;
+
+        int nbFrameToDo = (int) (timeToRise / Time.deltaTime);
+        float timePerFrame = timeToRise / nbFrameToDo;
+        Vector3 force = m_gravityForce + Vector3.up * m_forceUp * getDistanceRatio(user);
+        Vector3 acceleration = force / m_rigidBody.mass;
+
+        float heightTraveled = 0;
+        float speed = 0;
+
+        for (int i = 0; i < nbFrameToDo; ++i)
+        {
+            speed += acceleration.y * timePerFrame;
+            heightTraveled += speed * timePerFrame;
+        }
+
+        return transform.position.y + heightTraveled >= m_heightToReach;
     }
 }
