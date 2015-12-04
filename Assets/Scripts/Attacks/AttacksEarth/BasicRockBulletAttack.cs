@@ -14,18 +14,18 @@ public class BasicRockBulletAttack : BasicAttack {
 
 	// ---
 
-	public override void updateMe() {
+	protected override void updateMe() {
 		attack1();
 	}
 
-	public override float WAIT_TIME() {
+	protected override float WAIT_TIME() {
 		return 1.0f;
 	}
 
 	// ---
 
 	private void attack1() {
-		Collider[] colliders = Physics.OverlapSphere(transform.position, m_rangeToTakeBullet);
+		Collider[] colliders = Physics.OverlapSphere(executer.transform.position, m_rangeToTakeBullet);
 		FlingableRock bullet = null;
 		
 		if (colliders.Length > 0)
@@ -35,7 +35,7 @@ public class BasicRockBulletAttack : BasicAttack {
 				spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
 			else
 			{
-				//bullet.setUser(this, false);
+				//bullet.setUser(executer, false);
 				bullet.fling("Fire1", m_attack1ForceUp, m_attack1ForceForward, false);
 			}
 		}
@@ -74,7 +74,7 @@ public class BasicRockBulletAttack : BasicAttack {
 	}
 	
 	private void spawnAndFlingBullet(string _buttonToWatch, float _forceUp, float _forceForward) {
-		Vector3 spawnProjectile = transform.position + transform.forward * m_OffsetForwardEarth;
+		Vector3 spawnProjectile = executer.transform.position + executer.transform.forward * m_OffsetForwardEarth;
 		RaycastHit hit;
 		if (Physics.Raycast(spawnProjectile, -Vector3.up, out hit, 50))
 		{

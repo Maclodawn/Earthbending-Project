@@ -3,10 +3,10 @@ using System.Collections;
 
 public abstract class BasicAttack : MonoBehaviour {
 
-	private bool icanexecute;
-	private CharacterMovement executer;
+	protected bool icanexecute;
+	protected CharacterMovement executer;
 
-	private float timer = 0f;
+	protected float timer = 0f;
 
 	public void Start() {
 		executer = GetComponent<CharacterMovementEarth>();
@@ -28,6 +28,6 @@ public abstract class BasicAttack : MonoBehaviour {
 		timer = 0f;
 	}
 
-	public abstract void updateMe();
-	public abstract float WAIT_TIME();
+	protected abstract void updateMe();
+	protected abstract float WAIT_TIME();
 }
