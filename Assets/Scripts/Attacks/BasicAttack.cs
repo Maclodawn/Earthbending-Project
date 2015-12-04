@@ -13,19 +13,20 @@ public abstract class BasicAttack : MonoBehaviour {
 	}
 
 	public void Update() {
-		timer = Mathf.Max(timer+Time.deltaTime, WAIT_TIME());
+		if (timer < WAIT_TIME())
+			timer += Time.deltaTime;
 
-		if (!icanexecute)
+		if (!icanexecute || timer < WAIT_TIME())
 			return;
 
 		updateMe();
 
 		icanexecute = false;
+		timer = 0f;
 	}
 
 	public void executeAttack() {
 		icanexecute = true;
-		timer = 0f;
 	}
 
 	protected abstract void updateMe();

@@ -10,11 +10,6 @@ public class BasicAI2 : CharacterBasic {
 	private List<GameObject> objects;
 
 	// ---
-
-	private static float DeltaTime = 0.5f;
-	private float timeCount = 0f;
-
-	// ---
 	
 	public void Start() {
 		frustums = GetComponentsInChildren<Frustum>();
@@ -24,15 +19,9 @@ public class BasicAI2 : CharacterBasic {
 	
 	public void Update() {
 		UpdateFrustum();
-		
-		if (timeCount > DeltaTime) {
-			timeCount = 0f;
-			
-			if (objects.Count > 0 && !IsFriend(objects[0]))
-				attack1.executeAttack(); //TODO: give target position
-		}
-		
-		timeCount += Time.deltaTime;
+
+		if (objects.Count > 0 && !IsFriend(objects[0]))
+			attack1.executeAttack(); //TODO: give target position
 	}
 
 	// ---
