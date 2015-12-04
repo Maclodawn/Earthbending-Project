@@ -9,7 +9,6 @@
 |	   |__/   \______/ |_______/  \______/ 	|
 \*=========================================*/
 EarthBending :
-	- Vertical pillar spawning when only wheel click
 	- Leaned pillar spawning when (wheel click + forward movement)
 	- Slow down rock until it stops if trying to bend a rock coming towards us
 	- Blow apart rocks once colliding

@@ -158,8 +158,7 @@ public class CharacterMovementEarth : CharacterMovement
 
         if (collided && breakableRock != null)
         {
-            BreakableRockPillar breakableRockPillar = hit.collider.gameObject.GetComponentInParent<BreakableRockPillar>();
-            breakableRockPillar.breakRock(m_username, "Fire2", m_attack1ForceUp, m_attack1ForceForward);
+            breakableRock.breakRock(m_username, "Fire2", m_attack1ForceUp, m_attack1ForceForward);
         }
         else
         {
@@ -191,10 +190,10 @@ public class CharacterMovementEarth : CharacterMovement
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 5000))
         {
-            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("WallEarth"))
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("VerticalPillarEarth"))
             {
                 BreakableRockWall breakableRockWall = hit.collider.gameObject.GetComponent<BreakableRockWall>();
-                breakableRockWall.breakRock(m_username, "Fire3", m_attack1ForceUp, m_attack1ForceForward);
+                breakableRockWall.breakRock(m_username, "Fire2", m_attack1ForceUp, m_attack1ForceForward);
             }
             else
             {
@@ -211,6 +210,36 @@ public class CharacterMovementEarth : CharacterMovement
                 Vector3 vect = newDirection * ySize / 2.0f;
                 Instantiate(m_attack3Object, hit.point - vect, rotation);
                 m_executingAtk3 = true;
+            }
+        }
+    }
+
+    protected override void basicAttack4()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 5000))
+        {
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("WallEarth"))
+            {
+                BreakableRockWall breakableRockWall = hit.collider.gameObject.GetComponent<BreakableRockWall>();
+                breakableRockWall.breakRock(m_username, "Fire2", m_attack1ForceUp, m_attack1ForceForward);
+            }
+            else
+            {
+                Quaternion rotation = Quaternion.FromToRotation(transform.up, hit.normal) * Quaternion.FromToRotation(m_attack4Object.transform.forward, transform.forward);
+                Vector3 newDirection = rotation * m_attack4Object.transform.up;
+
+                float ySize = 0;
+                for (int i = 0; i < m_attack4Object.transform.childCount; ++i)
+                {
+                    MeshRenderer meshRenderer = m_attack4Object.transform.GetChild(i).GetComponent<MeshRenderer>();
+                    ySize += meshRenderer.bounds.size.y;
+                }
+
+                Vector3 vect = newDirection * ySize / 2.0f;
+                Instantiate(m_attack4Object, hit.point - vect, rotation);
+                m_executingAtk4 = true;
             }
         }
     }

@@ -25,4 +25,9 @@ public class Manager : MonoBehaviour
         GameObject player = Instantiate(m_originalPlayer);
         player.GetComponent<CharacterMovement>().init(this);
     }
+
+    void Update()
+    {
+        //ShowSize.PrintShowSize();
+    }
 }

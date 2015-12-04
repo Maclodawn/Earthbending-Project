@@ -34,9 +34,11 @@ public class CharacterMovement : MonoBehaviour
     protected bool m_executingAtk1 = false;
     protected bool m_executingAtk2 = false;
     protected bool m_executingAtk3 = false;
+    protected bool m_executingAtk4 = false;
     public GameObject m_attack1Object;
     public GameObject m_attack2Object;
     public GameObject m_attack3Object;
+    public GameObject m_attack4Object;
 
     public string m_username = "";
 
@@ -243,14 +245,22 @@ public class CharacterMovement : MonoBehaviour
 
     protected virtual void attack()
     {
-        if (Input.GetButtonDown("Fire1") && m_controller.isGrounded && !m_dodging)
-            basicAttack1();
+        if (m_controller.isGrounded && !m_dodging)
+        {
+            if (Input.GetButtonDown("Fire1"))
+                basicAttack1();
 
-        if (Input.GetButtonDown("Fire2") && m_controller.isGrounded && !m_dodging)
-            basicAttack2();
+            if (Input.GetButtonDown("Fire2"))
+                basicAttack2();
 
-        if (Input.GetButtonDown("Fire3") && Input.GetKey(KeyCode.S) && m_controller.isGrounded && !m_dodging)
-            basicAttack3();
+            if (Input.GetButtonDown("Fire3"))
+            {
+                if (Input.GetKey(KeyCode.S))
+                    basicAttack4();
+                else
+                    basicAttack3();
+            }
+        }
     }
 
     protected virtual void basicAttack1()
@@ -260,6 +270,9 @@ public class CharacterMovement : MonoBehaviour
     { }
 
     protected virtual void basicAttack3()
+    { }
+
+    protected virtual void basicAttack4()
     { }
 
     void dodge()

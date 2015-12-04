@@ -4,40 +4,12 @@ using System.Collections.Generic;
 
 public class BreakableRockPillar : BreakableRock
 {
-    bool m_isSpawning = true;
-    bool m_notFrozen = true;
-    [SerializeField]
-    float m_timeToGoOut;
-    Vector3 m_forwardOut;
-
-    Vector3 m_size;
-    Vector3 m_baseSize;
-
-    Rigidbody m_rigidBody;
-    BoxCollider m_boxCollider;
-
-    [SerializeField]
-    List<GameObject> m_pieceList;
-
     // Use this for initialization
-    void Start()
+    protected override void Start()
     {
-        m_rigidBody = GetComponent<Rigidbody>();
+        base.Start();
 
-        m_boxCollider = transform.GetComponentInChildren<BoxCollider>();
         Physics.IgnoreCollision(m_boxCollider, Manager.getManager().m_terrain.GetComponent<Collider>());
-
-        for (int i = 0; i < transform.childCount; ++i)
-        {
-            Transform tmpTransform = transform.GetChild(i);
-            MeshRenderer tmpMeshRenderer = tmpTransform.GetComponent<MeshRenderer>();
-            if (tmpMeshRenderer == null)
-                continue;
-
-            if (tmpTransform.gameObject.name.Contains("Base"))
-                m_baseSize = tmpMeshRenderer.bounds.size;
-            m_size += tmpMeshRenderer.bounds.size;
-        }
 
         float angle = m_boxCollider.transform.eulerAngles.z * Mathf.PI / 180;
         float adjacent = transform.forward.magnitude;
@@ -52,70 +24,30 @@ public class BreakableRockPillar : BreakableRock
         float z = m_size.z / 4;
         float xz = Mathf.Sqrt(x * x + z * z);
         transform.position -= m_forwardOut * Mathf.Sqrt(y * y + xz * xz);
-
-        float volume = MeshVolumeHelper.VolumeOfObject(gameObject);
-        // 2700 is the average density of a rock Cf. http://www.les-mathematiques.net/phorum/read.php?2,49845
-        m_rigidBody.mass = volume * 2700;
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            Destroy(this.gameObject);
-        }
+        base.Update();
+    }
 
-        if (m_isSpawning)
-        {
-            float forceUp = m_rigidBody.mass * m_size.y / (m_timeToGoOut * m_timeToGoOut);
-            m_rigidBody.AddForce(m_forwardOut * forceUp);
+    protected override void updateNotFrozenYet()
+    {
+        Ray ray = new Ray(transform.position - transform.up * (m_size.y * transform.localScale.x / 2 - m_baseSize.y), -transform.up);
+        RaycastHit hit;
+        bool rayCast = Physics.Raycast(ray, out hit, 10);
 
-            m_isSpawning = false;
-        }
-        else if (m_notFrozen)
+        if (rayCast && hit.transform.gameObject.name.Contains("Terrain"))
         {
-            Ray ray = new Ray(transform.position - transform.up * (m_size.y * transform.localScale.x / 2 - m_baseSize.y), -transform.up);
-            RaycastHit hit;
-            bool rayCast = Physics.Raycast(ray, out hit, 10);
-
-            if (rayCast && hit.transform.gameObject.name.Contains("Terrain"))
-            {
-                m_rigidBody.constraints = RigidbodyConstraints.FreezeAll;
-                m_notFrozen = false;
-            }
+            m_rigidBody.constraints = RigidbodyConstraints.FreezeAll;
+            m_notFrozen = false;
         }
     }
 
-    public void breakRock(string _username, string _buttonToWatch, float _forceUp, float _forceForward)
+    protected override void scaleIt(GameObject _gameObject)
     {
-        if (transform.childCount <= 1)
-            return;
-
-        Transform child = transform.GetChild(0);
-        if (!child.name.Contains("PillarEarth"))
-            return;
-
-        MeshRenderer childMeshRenderer = child.GetComponent<MeshRenderer>();
-
-        float centerRatio = childMeshRenderer.bounds.size.y / (2 * m_size.y);
-        m_boxCollider.center -= new Vector3(0, centerRatio, 0);
-
-        float sizeRatio = 1 - childMeshRenderer.bounds.size.y / m_size.y;
-        m_boxCollider.size = new Vector3(m_boxCollider.size.x, sizeRatio, m_boxCollider.size.z);
-
-        m_size -= childMeshRenderer.bounds.size;
-
-        if (m_pieceList.Count == 0)
-            return;
-
-        Object obj = Instantiate(m_pieceList[0], child.position + Vector3.up * 0.1f, child.rotation);
-        m_pieceList.RemoveAt(0);
-        GameObject gameObject = (GameObject)obj;
-        gameObject.transform.localScale = transform.localScale;
-        FlingableRock flingableRock = gameObject.GetComponent<FlingableRock>();
-        Destroy(child.gameObject);
-        flingableRock.setUser(_username);
-        flingableRock.fling(_buttonToWatch, _forceUp, _forceForward, false);
+        //FIXME : Besoin d'avoir des mesh dont le scale est à 1 même si leur taille ne fait pas 1
+        _gameObject.transform.localScale = transform.localScale;
     }
 }
