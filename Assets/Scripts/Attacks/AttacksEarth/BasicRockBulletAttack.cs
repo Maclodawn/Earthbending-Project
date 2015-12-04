@@ -19,7 +19,7 @@ public class BasicRockBulletAttack : BasicAttack {
 	}
 
 	protected override float WAIT_TIME() {
-		return 1.0f;
+		return 0.3f;
 	}
 
 	// ---

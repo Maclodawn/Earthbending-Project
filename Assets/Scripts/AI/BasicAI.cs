@@ -11,17 +11,14 @@ public class BasicAI : MonoBehaviour {
 	public float m_OffsetForwardEarth = 1;
 	private float m_timerAttack = 0.3f;
 	private float m_coolDownAttack = 0.3f;
-	[SerializeField]
-	private float m_rangeToTakeBullet = 5.0f;
-
-	[SerializeField]
-	private float m_attack1ForceUp;
-	[SerializeField]
-	private float m_attack1ForceForward;
+	public float m_rangeToTakeBullet = 5.0f;
+	
+	public float m_attack1ForceUp;
+	public float m_attack1ForceForward;
 
 	public string m_username = "AIBody";
 
-	//---
+	// ---
 
 	private Frustum[] frustums;
 	private List<GameObject> objects;

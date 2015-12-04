@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CharacterBasic : MonoBehaviour {
+public abstract class CharacterBasic : MonoBehaviour {
+
+	// --- movement parameters
 
 	protected float m_currentMoveSpeed = 1.0f;		// vitesse actuelle : mise à jour
 	public float m_runSpeed = 7.0f;					// vitesse de course
@@ -28,23 +30,14 @@ public class CharacterBasic : MonoBehaviour {
 	protected float m_cooldownBeforeDodgeTimer = 1;	// temps qui s'est écoulé depuis dernier dodge
 	protected bool m_ableToDodge = true;			// savoir si on peut dodge
 
-
-	// TODO component model: we make prefabs with execution scripts inside them
-	protected bool m_executingAtk1 = false;
-	protected bool m_executingAtk2 = false;
-	protected bool m_executingAtk3 = false;
-	public GameObject m_attack1Object;
-	public GameObject m_attack2Object;
-	public GameObject m_attack3Object;
-	
-	public string m_username = "";					// nom de l'utilisateur
-	
-	private bool m_cursorLocked;					// savoir si le curseur est locké
-
-	// ---
+	// --- input management
 
 	protected bool fwMove, rgMove, lfMove, bkMove;
 	protected bool pause;
-	protected bool crouched, sprint, jump;
+	protected bool crouched, sprint, jump, dodge;
 	protected bool atk1, atk2, atk3;
+	
+	private BasicAttack attack;
+
+	// ---
 }
