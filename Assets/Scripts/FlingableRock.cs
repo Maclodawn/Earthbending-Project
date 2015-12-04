@@ -238,7 +238,8 @@ public class FlingableRock : MonoBehaviour
 
 		foreach (GameObject go in gos)
         {
-			if (go.GetComponent<CharacterMovement>() != null && go.GetComponent<CharacterMovement>().m_username.Equals(_playerID)) {
+			if (go.GetComponent<CharacterMovement>() != null && go.GetComponent<CharacterMovement>().m_username.Equals(_playerID))
+            {
 				m_user = go.GetComponent<CharacterMovementEarth>();
 				break;
 			}
@@ -296,6 +297,11 @@ public class FlingableRock : MonoBehaviour
 
     float getDistanceRatio()
     {
+        if (m_user == null)
+        {
+            int otot = 0;
+            otot++;
+        }
         float ratio = m_user.m_OffsetForwardEarth / Vector3.Distance(transform.position, m_user.transform.position);
         return Mathf.Min(4 * ratio, 1);
     }
