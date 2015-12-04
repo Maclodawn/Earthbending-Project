@@ -4,10 +4,17 @@ using System.Collections;
 public class CharacterMovementEarth : CharacterMovement
 {
     public float m_OffsetForwardEarth = 1;
-    public float m_projOffsetYEarth1 = -1;
-    float m_timerAttack1 = 0.3f;
-    float m_coolDownAttack1 = 0.3f;
-    public float m_rangeToTakeBullet = 5.0f;
+    float m_timerAttack = 0.3f;
+    float m_coolDownAttack = 0.3f;
+    [SerializeField]
+    float m_rangeToTakeBullet = 5.0f;
+
+    Collider[] colliderList;
+
+    [SerializeField]
+    float m_attack1ForceUp;
+    [SerializeField]
+    float m_attack1ForceForward;
 
     // Update is called once per frame
     protected override void Update()
@@ -21,10 +28,10 @@ public class CharacterMovementEarth : CharacterMovement
 
         if (m_executingAtk1)
         {
-            m_coolDownAttack1 -= Time.deltaTime;
-            if (m_coolDownAttack1 <= 0)
+            m_coolDownAttack -= Time.deltaTime;
+            if (m_coolDownAttack <= 0)
             {
-                m_coolDownAttack1 = m_timerAttack1;
+                m_coolDownAttack = m_timerAttack;
                 m_executingAtk1 = false;
             }
             else
@@ -36,11 +43,26 @@ public class CharacterMovementEarth : CharacterMovement
 
         if (m_executingAtk2)
         {
-            m_coolDownAttack1 -= Time.deltaTime;
-            if (m_coolDownAttack1 <= 0)
+            m_coolDownAttack -= Time.deltaTime;
+            if (m_coolDownAttack <= 0)
             {
-                m_coolDownAttack1 = m_timerAttack1;
+                m_coolDownAttack = m_timerAttack;
                 m_executingAtk2 = false;
+            }
+            else
+            {
+                m_rightSpeed = 0;
+                m_forwardSpeed = 0;
+            }
+        }
+
+        if (m_executingAtk3)
+        {
+            m_coolDownAttack -= Time.deltaTime;
+            if (m_coolDownAttack <= 0)
+            {
+                m_coolDownAttack = m_timerAttack;
+                m_executingAtk3 = false;
             }
             else
             {
@@ -52,69 +74,126 @@ public class CharacterMovementEarth : CharacterMovement
 
     protected override void basicAttack1()
     {
-        m_manager.m_bulletList.RemoveAll(item => item == null);
-        BasicRockBullet bullet = null;
+        colliderList = Physics.OverlapSphere(transform.position, m_rangeToTakeBullet);
+        FlingableRock bullet = null;
 
-        if (m_manager.m_bulletList.Count > 0)
+        if (colliderList.Length > 0)
         {
             bullet = findBullet();
             if (!bullet)
-                spawnAndFlingBullet();
+                spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
             else
             {
                 bullet.setUser(m_username);
-                bullet.fling();
+                bullet.fling("Fire1", m_attack1ForceUp, m_attack1ForceForward, false);
             }
         }
         else
-            spawnAndFlingBullet();
+            spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
 
         m_executingAtk1 = true;
     }
 
-    BasicRockBullet findBullet()
+    FlingableRock findBullet()
     {
-        for (int i = 0; i < m_manager.m_bulletList.Count; ++i)
-        {
-            if (m_manager.m_bulletList[i].m_user != null)
-                continue;
+        int closerOne = -1;
+        float closerDist = 0;
 
-            Vector3 positionA = transform.position;
-            Vector3 positionB = m_manager.m_bulletList[i].transform.position;
-            float distance = Mathf.Sqrt(Mathf.Pow(positionA.x - positionB.x, 2) + Mathf.Pow(positionA.y - positionB.y, 2) + Mathf.Pow(positionA.z - positionB.z, 2));
-            if (distance < m_rangeToTakeBullet)
+        for (int i = 0; i < colliderList.Length; ++i)
+        {
+            FlingableRock rock = colliderList[i].GetComponent<FlingableRock>();
+
+            if (rock != null)
             {
-                return m_manager.m_bulletList[i];
+                if (rock.m_user != null)
+                    continue;
+
+                float distance = Vector3.Distance(transform.position, rock.transform.position);
+                if (distance < m_rangeToTakeBullet && (closerOne == -1 || closerDist > distance))
+                {
+                    closerDist = distance;
+                    closerOne = i;
+                }
             }
         }
-        return null;
+
+        if (closerOne == -1)
+            return null;
+        else
+            return colliderList[closerOne].GetComponent<FlingableRock>();
     }
 
-    void spawnAndFlingBullet()
+    void spawnAndFlingBullet(string _buttonToWatch, float _forceUp, float _forceForward)
     {
-        Vector3 spawnProjectile = transform.position + transform.forward * m_OffsetForwardEarth + new Vector3(0, m_projOffsetYEarth1, 0);
-        BasicRockBullet tmpBullet = ((GameObject)Instantiate(m_attack1Object, spawnProjectile, Quaternion.identity)).GetComponent<BasicRockBullet>();
-        tmpBullet.init(m_manager);
-        tmpBullet.m_spawningHeightOffset = m_projOffsetYEarth1;
-        tmpBullet.setUser(m_username);
+        Vector3 spawnProjectile = transform.position + transform.forward * m_OffsetForwardEarth;
+        RaycastHit hit;
+        if (Physics.Raycast(spawnProjectile, -Vector3.up, out hit, 50))
+        {
+            if (m_attack1Object.transform.childCount == 0)
+                return;
+            Transform child = m_attack1Object.transform.GetChild(0);
+            MeshRenderer meshRenderer = child.GetComponent<MeshRenderer>();
+            spawnProjectile = hit.point - new Vector3(0, meshRenderer.bounds.extents.y, 0);
+
+            FlingableRock tmpBullet = ((GameObject)Instantiate(m_attack1Object, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
+            tmpBullet.setUser(m_username);
+            tmpBullet.init(_buttonToWatch, _forceUp, _forceForward);
+        }
     }
 
     protected override void basicAttack2()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
+        RaycastHit hit = new RaycastHit();
+        if (!Physics.Raycast(ray, out hit, 5000))
+            hit.point = ray.direction * 5000;
+
+        Debug.DrawLine(ray.origin, hit.point, Color.white);
+
+        Vector3 direction = hit.point - transform.position;
+        direction.Normalize();
+
+        RaycastHit hitGround;
+        {
+            Vector3 origin = transform.position + transform.forward * m_OffsetForwardEarth * 4;
+            if (!Physics.Raycast(origin, -Vector3.up, out hitGround, 50))
+                Physics.Raycast(origin, Vector3.up, out hitGround, 50);
+        }
+
+        if (!hitGround.collider.gameObject.name.Contains("Terrain"))
+            return;
+
+        Quaternion rotation = Quaternion.FromToRotation(transform.up, hitGround.normal) * Quaternion.FromToRotation(m_attack2Object.transform.forward, transform.forward);
+
+        Instantiate(m_attack2Object, hitGround.point, rotation);
+    }
+
+    protected override void basicAttack3()
     {
         Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 5000))
         {
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("WallEarth"))
-                print(hit.collider.gameObject.tag);
+            {
+                BreakableRockWall breakableRockWall = hit.collider.gameObject.GetComponent<BreakableRockWall>();
+                breakableRockWall.breakRock(m_username, "Fire3", m_attack1ForceUp, 4000000);
+            }
             else
             {
-                //                 Vector3 targetDir = hit.point - (transform.position + transform.forward * m_OffsetForwardEarth + new Vector3(0, m_projOffsetYearth1, 0));
-                //                 float step = 10 * Time.deltaTime;
-                //                 Vector3 newDir = Vector3.RotateTowards(transform.forward + new Vector3(0, m_projOffsetYearth1, 0), targetDir, step, 0.0f);
-                Instantiate(m_attack2Object, hit.point + new Vector3(0, -3, 0), transform.rotation);
-                m_executingAtk2 = true;
-                print(hit.collider.gameObject.name);
+                Quaternion rotation = Quaternion.FromToRotation(transform.up, hit.normal) * Quaternion.FromToRotation(m_attack3Object.transform.forward, transform.forward);
+                Vector3 newDirection = rotation * m_attack3Object.transform.up;
+
+                float ySize = 0;
+                for (int i = 0; i < m_attack3Object.transform.childCount; ++i)
+                {
+                    MeshRenderer meshRenderer = m_attack3Object.transform.GetChild(i).GetComponent<MeshRenderer>();
+                    ySize += meshRenderer.bounds.size.y;
+                }
+
+                Vector3 vect = newDirection * ySize / 2.0f;
+                Instantiate(m_attack3Object, hit.point - vect, rotation);
+                m_executingAtk3 = true;
             }
         }
     }
