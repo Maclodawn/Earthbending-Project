@@ -249,7 +249,7 @@ public class CharacterMovement : MonoBehaviour
         if (Input.GetButtonDown("Fire2") && m_controller.isGrounded && !m_dodging)
             basicAttack2();
 
-        if (Input.GetButtonDown("Fire3") && m_controller.isGrounded && !m_dodging)
+        if (Input.GetButtonDown("Fire3") && Input.GetKey(KeyCode.S) && m_controller.isGrounded && !m_dodging)
             basicAttack3();
     }
 

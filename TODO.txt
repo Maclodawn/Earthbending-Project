@@ -9,7 +9,6 @@
 |	   |__/   \______/ |_______/  \______/ 	|
 \*=========================================*/
 EarthBending :
-	- Changing keys for spawning walls from (right click) to (wheel click + back movement)
 	- Vertical pillar spawning when only wheel click
 	- Leaned pillar spawning when (wheel click + forward movement)
 	- Slow down rock until it stops if trying to bend a rock coming towards us
