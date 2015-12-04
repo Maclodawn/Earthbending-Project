@@ -7,14 +7,14 @@ public class CharacterMovementEarth : CharacterMovement
     float m_timerAttack = 0.3f;
     float m_coolDownAttack = 0.3f;
     [SerializeField]
-    float m_rangeToTakeBullet = 5.0f;
+    float m_rangeToTakeBullet = 15.0f;
 
     Collider[] colliderList;
 
     [SerializeField]
-    float m_attack1ForceUp;
+    float m_attack1ForceUp = 32000;
     [SerializeField]
-    float m_attack1ForceForward;
+    float m_attack1ForceForward = 1000000;
 
     // Update is called once per frame
     protected override void Update()
@@ -188,12 +188,15 @@ public class CharacterMovementEarth : CharacterMovement
     {
         Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
         RaycastHit hit;
+        bool collided = Physics.Raycast(ray, out hit, 5000);
+
+        BreakableRock breakableRock = hit.collider.GetComponentInParent<BreakableRock>();
+
         if (Physics.Raycast(ray, out hit, 5000))
         {
-            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("VerticalPillarEarth"))
+            if (collided && breakableRock != null)
             {
-                BreakableRockWall breakableRockWall = hit.collider.gameObject.GetComponent<BreakableRockWall>();
-                breakableRockWall.breakRock(m_username, "Fire2", m_attack1ForceUp, m_attack1ForceForward);
+                breakableRock.breakRock(m_username, "Fire2", m_attack1ForceUp, m_attack1ForceForward);
             }
             else
             {
@@ -218,12 +221,14 @@ public class CharacterMovementEarth : CharacterMovement
     {
         Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
         RaycastHit hit;
+        bool collided = Physics.Raycast(ray, out hit, 5000);
+
+        BreakableRock breakableRock = hit.collider.GetComponentInParent<BreakableRock>();
         if (Physics.Raycast(ray, out hit, 5000))
         {
-            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("WallEarth"))
+            if (collided && breakableRock != null)
             {
-                BreakableRockWall breakableRockWall = hit.collider.gameObject.GetComponent<BreakableRockWall>();
-                breakableRockWall.breakRock(m_username, "Fire2", m_attack1ForceUp, m_attack1ForceForward);
+                breakableRock.breakRock(m_username, "Fire2", m_attack1ForceUp, m_attack1ForceForward);
             }
             else
             {

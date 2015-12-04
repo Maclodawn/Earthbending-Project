@@ -7,10 +7,13 @@ public class BasicRockBulletAttack : BasicAttack {
 	public GameObject rockBullet;
 
 	public float m_OffsetForwardEarth = 1;
-	public float m_rangeToTakeBullet = 5.0f;
-	
-	public float m_attack1ForceUp;
-	public float m_attack1ForceForward;
+    [SerializeField]
+    float m_rangeToTakeBullet = 15.0f;
+
+    [SerializeField]
+    float m_attack1ForceUp = 32000;
+    [SerializeField]
+    float m_attack1ForceForward = 1000000;
 
 	// ---
 
