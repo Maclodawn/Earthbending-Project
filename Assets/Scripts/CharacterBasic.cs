@@ -5,6 +5,8 @@ public abstract class CharacterBasic : MonoBehaviour {
 
 	// --- movement parameters
 
+	protected CharacterController m_controller;
+
 	protected float m_currentMoveSpeed = 1.0f;		// vitesse actuelle : mise à jour
 	public float m_runSpeed = 7.0f;					// vitesse de course
 	public float m_sprintSpeed = 14.0f;				// vitesse de sprint
@@ -32,12 +34,13 @@ public abstract class CharacterBasic : MonoBehaviour {
 
 	// --- input management
 
-	protected bool fwMove, rgMove, lfMove, bkMove;
+	//protected bool fwMove, rgMove, lfMove, bkMove;
 	protected bool pause;
 	protected bool crouched, sprint, jump, dodge;
 	protected bool atk1, atk2, atk3;
-	
-	private BasicAttack attack;
+	protected Vector3 movement;
+
+	// private BasicAttack attack;
 
 	// ---
 }

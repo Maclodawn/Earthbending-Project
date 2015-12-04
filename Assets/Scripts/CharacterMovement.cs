@@ -3,8 +3,6 @@ using System.Collections;
 
 public class CharacterMovement : MonoBehaviour
 {
-	public Manager ok;
-
     protected Manager m_manager;
     protected CharacterController m_controller;
 
