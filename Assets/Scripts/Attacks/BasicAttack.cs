@@ -16,7 +16,7 @@ public abstract class BasicAttack : MonoBehaviour {
 		if (timer < WAIT_TIME())
 			timer += Time.deltaTime;
 
-		if (!icanexecute || timer < WAIT_TIME())
+		if (!icanexecute || isBusy())
 			return;
 
 		updateMe();
@@ -27,6 +27,10 @@ public abstract class BasicAttack : MonoBehaviour {
 
 	public void executeAttack() {
 		icanexecute = true;
+	}
+
+	public bool isBusy() {
+		return timer < WAIT_TIME();
 	}
 
 	protected abstract void updateMe();
