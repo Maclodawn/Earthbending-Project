@@ -3,7 +3,7 @@ using System.Collections;
 
 public abstract class AttacksGetter : MonoBehaviour {
 
-	protected BasicAttack[] atks;
+	protected BasicAttack[] atks = null;
 
 	protected abstract void init();
 

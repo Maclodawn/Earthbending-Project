@@ -28,7 +28,7 @@ public class BasicRockBulletAttack : BasicAttack {
 	// ---
 
 	private void attack1() {
-		Collider[] colliders = Physics.OverlapSphere(executer.transform.position, m_rangeToTakeBullet);
+		Collider[] colliders = Physics.OverlapSphere(transform.position, m_rangeToTakeBullet);
 		FlingableRock bullet = null;
 		
 		if (colliders.Length > 0)
@@ -77,7 +77,7 @@ public class BasicRockBulletAttack : BasicAttack {
 	}
 	
 	private void spawnAndFlingBullet(string _buttonToWatch, float _forceUp, float _forceForward) {
-		Vector3 spawnProjectile = executer.transform.position + executer.transform.forward * m_OffsetForwardEarth;
+		Vector3 spawnProjectile = transform.position + transform.forward * m_OffsetForwardEarth;
 		RaycastHit hit;
 		if (Physics.Raycast(spawnProjectile, -Vector3.up, out hit, 50))
 		{
