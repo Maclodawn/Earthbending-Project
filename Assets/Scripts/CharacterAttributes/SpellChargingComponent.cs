@@ -11,19 +11,41 @@ public class SpellChargingComponent : MonoBehaviour {
         IDLE,
     }
 
+    public delegate void ReadinessChangedEventHandler(object sender, float _oldReadiness, float _newReadiness);
+    public event ReadinessChangedEventHandler ReadinessChanged;
+
     private State m_state;
-    private float m_readyness;
+    private float m_readiness;
 
     public float ChargeRate;
     public float CooldownRate;
-    public bool ResetWhenChargeStop;
+    public bool ResetWhenChargeStop = true;
 
     public object Tag;
+
+    public float Readiness
+    {
+        get { return m_readiness; }
+        set
+        {
+            float oldValue = m_readiness;
+            m_readiness = value;
+            OnReadinessChanged(oldValue, m_readiness);
+        }
+    }
 
     public void StartCharging()
     {
         if(m_state == State.IDLE)
-            m_state = State.CHARGING;
+        {
+            if (ChargeRate > 0)
+                m_state = State.CHARGING;
+            else
+            {
+                m_state = State.READY;
+                Readiness = 1;
+            }
+        }
     }
 
     public void StopCharging()
@@ -31,7 +53,7 @@ public class SpellChargingComponent : MonoBehaviour {
         if(m_state == State.CHARGING)
         {
             if(ResetWhenChargeStop)
-                m_readyness = 0;
+                Readiness = 0;
             
             m_state = State.IDLE;
         }
@@ -51,7 +73,13 @@ public class SpellChargingComponent : MonoBehaviour {
     {
         if(Ready())
         {
-            m_state = State.COOLDOWN;
+            if(CooldownRate > 0)
+                m_state = State.COOLDOWN;
+            else
+            {
+                m_state = State.IDLE;
+                Readiness = 0;
+            }
         }
 
         StopCharging();
@@ -59,7 +87,7 @@ public class SpellChargingComponent : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        m_readyness = 0;
+        Readiness = 0;
         m_state = State.IDLE;
 	}
 	
@@ -68,11 +96,11 @@ public class SpellChargingComponent : MonoBehaviour {
 	    switch(m_state)
         {
             case State.CHARGING:
-                m_readyness += ChargeRate * Time.deltaTime;
+                Readiness += ChargeRate * Time.deltaTime;
                 break;
 
             case State.COOLDOWN:
-                m_readyness -= CooldownRate * Time.deltaTime;
+                Readiness -= CooldownRate * Time.deltaTime;
                 break;
 
             case State.IDLE:
@@ -82,26 +110,26 @@ public class SpellChargingComponent : MonoBehaviour {
         }
 
         UpdateState();
-
-        // DEBUGGING
-        if (Input.GetKeyDown(KeyCode.T))
-            StartCharging();
-        else if (Input.GetKeyUp(KeyCode.T))
-            LaunchSpell();
 	}
 
     void UpdateState()
     {
-        if(m_readyness <= 0 && m_state != State.IDLE)
+        if (Readiness <= 0 && m_state != State.IDLE)
         {
-            m_readyness = 0;
+            Readiness = 0;
             m_state = State.IDLE;
         }
 
-        if(m_readyness >= 1 && m_state != State.READY)
+        if (Readiness >= 1 && m_state != State.READY)
         {
-            m_readyness = 1;
+            Readiness = 1;
             m_state = State.READY;
         }
+    }
+
+    protected void OnReadinessChanged(float oldReadiness, float newReadiness)
+    {
+        if (ReadinessChanged != null)
+            ReadinessChanged(this, oldReadiness, newReadiness);
     }
 }

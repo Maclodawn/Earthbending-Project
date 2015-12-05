@@ -13,6 +13,9 @@ public class Manager : MonoBehaviour
     [SerializeField]
     PowerBarController m_powerBar;
 
+    [SerializeField]
+    ChargeBarController m_chargeBar;
+
     void Awake()
     {
         GameObject player = Instantiate(m_originalPlayer);
@@ -26,6 +29,11 @@ public class Manager : MonoBehaviour
         if(m_powerBar != null)
         {
             m_powerBar.Setup(player.GetComponent<PowerComponent>());
+        }
+
+        if(m_chargeBar != null)
+        {
+            m_chargeBar.Setup(player.GetComponent<SpellChargingComponent>());
         }
     }
 }

@@ -9,6 +9,9 @@ public class HealthBarController : MonoBehaviour {
 
     public void Setup(HealthComponent _life)
     {
+        if (m_life != null)
+            m_life.HealthChanged -= OnHealthChanged;
+
         m_life = _life;
         m_bar = GetComponent<UnityEngine.UI.Image>();
 
@@ -23,8 +26,8 @@ public class HealthBarController : MonoBehaviour {
         if (m_life != null)
             Setup(m_life);
 	}
-	
-	public void OnHealthChanged(object sender, float oldHealth, float newHealth)
+
+    private void OnHealthChanged(object sender, float oldHealth, float newHealth)
     {
         if(sender == m_life)
         {

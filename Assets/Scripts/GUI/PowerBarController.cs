@@ -9,6 +9,9 @@ public class PowerBarController : MonoBehaviour {
 
     public void Setup(PowerComponent _power)
     {
+        if (m_power != null)
+            m_power.PowerChanged -= OnPowerChanged;
+
         m_power = _power;
         m_bar = GetComponent<UnityEngine.UI.Image>();
 
@@ -25,7 +28,7 @@ public class PowerBarController : MonoBehaviour {
             Setup(m_power);
     }
 
-    public void OnPowerChanged(object sender, float oldPower, float newPower)
+    private void OnPowerChanged(object sender, float oldPower, float newPower)
     {
         if (sender == m_power)
         {

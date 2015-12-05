@@ -19,14 +19,6 @@ public class HealthComponent : MonoBehaviour {
         Health = StartingHealth;
     }
 
-    void Update()
-    {
-        if (Input.GetKey(KeyCode.T))
-            Health--;
-        if (Input.GetKey(KeyCode.Y))
-            Health++;
-    }
-
     public float Health
     {
         get
