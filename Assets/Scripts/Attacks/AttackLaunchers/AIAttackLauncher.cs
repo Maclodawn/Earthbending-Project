@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AIAttackLauncher : BasicAttackLauncher {
+public class AIAttackLauncher : AttackLauncher {
 
 	protected override void updateInput() {
-		//TODO
+		//TODO AI thinking
+		atk = 0;
 	}
 }

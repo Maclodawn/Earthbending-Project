@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class BasicAttackLauncher : MonoBehaviour {
+public abstract class AttackLauncher : MonoBehaviour {
 
 	private BasicAttack[] atks;
 	protected int atk = -1;
