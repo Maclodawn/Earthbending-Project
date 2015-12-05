@@ -19,6 +19,14 @@ public class HealthComponent : MonoBehaviour {
         Health = StartingHealth;
     }
 
+    public bool HasMaxHealth()
+    {
+        if (CanHaveMoreThanMaxHealth)
+            return false;
+        else
+            return Health >= MaxHealth;
+    }
+
     public float Health
     {
         get

@@ -18,6 +18,11 @@ public class PowerComponent : MonoBehaviour {
         Power = StartingPower;
     }
 
+    public bool HasMaxPower()
+    {
+        return Power >= MaxPower;
+    }
+
     public float Power
     {
         get
