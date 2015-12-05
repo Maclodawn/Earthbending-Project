@@ -4,12 +4,12 @@ using System.Collections;
 public abstract class BasicAttack : MonoBehaviour {
 
 	protected bool icanexecute;
-	protected CharacterBasic executer;
+	//protected CharacterBasic executer;
 
 	protected float timer = 0f;
 
 	public void Start() {
-		executer = GetComponent<CharacterBasic>();
+		//executer = GetComponent<CharacterBasic>();
 	}
 
 	public void Update() {
