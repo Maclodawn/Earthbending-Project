@@ -5,6 +5,7 @@ public abstract class AttackLauncher : MonoBehaviour {
 
 	private BasicAttack[] atks;
 	protected int atk = -1;
+	protected bool hold;
 
 	// map here type of attacks to ids
 	public void Start() {
@@ -21,6 +22,10 @@ public abstract class AttackLauncher : MonoBehaviour {
 		atks[atk].executeAttack();
 
 		atk = -1;
+	}
+
+	public bool BasicAtkOnHold() {
+		return atk == 0 && hold;
 	}
 
 	private bool isBusy() {

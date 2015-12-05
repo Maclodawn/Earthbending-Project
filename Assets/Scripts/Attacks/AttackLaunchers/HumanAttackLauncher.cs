@@ -4,8 +4,10 @@ using System.Collections;
 public class HumanAttackLauncher : AttackLauncher {
 
 	protected override void updateInput() {
-		if (Input.GetButtonDown("Fire1"))
+		if (Input.GetButtonDown("Fire1")) {
 			atk = 0;
+			hold = true;
+		} else hold = false;
 		
 		if (Input.GetButtonDown("Fire2")) {
 			if (Input.GetKey(KeyCode.S))
