@@ -40,8 +40,12 @@ public class InGameMenu : MonoBehaviour
         {
             GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 
-            foreach (GameObject p in players)
-                print(p.GetComponent<CharacterMovement>().m_username);
+			int i = 0;
+
+            foreach (GameObject p in players) {
+               	//print(p.GetComponent<CharacterMovement>().m_username); //TODO check that...
+				print("Player " + (++i));
+			}
         }
     }
 }

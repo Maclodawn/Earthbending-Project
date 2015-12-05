@@ -120,4 +120,12 @@ public abstract class BasicMovement : MonoBehaviour {
 			m_cooldownBeforeDodgeTimer = 0;
 		} else m_cooldownBeforeDodgeTimer += Time.deltaTime;
 	}
+
+	public GameObject getCurrentGround() {
+		RaycastHit hit;
+		if (Physics.Raycast(transform.position, -Vector3.up, out hit, GetComponent<Collider>().bounds.extents.y + 0.1f))
+			return hit.collider.gameObject;
+		else
+			return null;
+	}
 }

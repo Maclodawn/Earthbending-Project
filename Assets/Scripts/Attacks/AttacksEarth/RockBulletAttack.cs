@@ -2,19 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class BasicRockBulletAttack : BasicAttack {
+public class RockBulletAttack : EarthAttack {
 
 	public GameObject rockBullet;
 
-	public float m_OffsetForwardEarth = 1;
     [SerializeField]
     float m_rangeToTakeBullet = 15.0f;
-
-    [SerializeField]
-    float m_attack1ForceUp = 32000;
-    [SerializeField]
-    float m_attack1ForceForward = 1000000;
-
+	
 	// ---
 
 	protected override void updateMe() {
@@ -38,7 +32,7 @@ public class BasicRockBulletAttack : BasicAttack {
 				spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
 			else
 			{
-				//bullet.setUser(executer, false);
+				bullet.setUser(gameObject);
 				bullet.fling("Fire1", m_attack1ForceUp, m_attack1ForceForward, false);
 			}
 		}
@@ -89,7 +83,7 @@ public class BasicRockBulletAttack : BasicAttack {
 			spawnProjectile = hit.point - new Vector3(0, meshRenderer.bounds.extents.y, 0);
 			
 			FlingableRock tmpBullet = ((GameObject)Instantiate(rockBullet, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
-			//tmpBullet.setUser(m_username);
+			tmpBullet.setUser(gameObject);
 			tmpBullet.init(_buttonToWatch, _forceUp, _forceForward);
 		}
 	}

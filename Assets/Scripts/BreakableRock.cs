@@ -72,7 +72,7 @@ public class BreakableRock : MonoBehaviour
     protected virtual void updateNotFrozenYet()
     {}
 
-    public void breakRock(string _username, string _buttonToWatch, float _forceUp, float _forceForward)
+    public void breakRock(GameObject _user, string _buttonToWatch, float _forceUp, float _forceForward)
     {
         if (transform.childCount <= 1)
             return;
@@ -100,7 +100,7 @@ public class BreakableRock : MonoBehaviour
         scaleIt(gameObject);
         FlingableRock flingableRock = gameObject.GetComponent<FlingableRock>();
         Destroy(child.gameObject);
-        flingableRock.setUser(_username);
+        flingableRock.setUser(_user);
         flingableRock.fling(_buttonToWatch, _forceUp, _forceForward, true);
     }
 

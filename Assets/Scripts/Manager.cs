@@ -25,8 +25,10 @@ public class Manager : MonoBehaviour
 
     void Awake()
     {
-        GameObject player = Instantiate(m_originalPlayer);
-        player.GetComponent<CharacterMovement>().init(this);
+        //GameObject player = Instantiate(m_originalPlayer);
+        //player.GetComponent<CharacterMovement>().init(this);
+
+		Instantiate(m_originalPlayer);
 
 		for (int i = 0; i < nAI; ++i)
 			Instantiate(AIBody);

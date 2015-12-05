@@ -33,7 +33,7 @@ public class FlingableRock : MonoBehaviour
     public GameObject m_smokeStartToMove;
     public GameObject m_smokeCollide;
 
-    public CharacterMovementEarth m_user { get; set; }
+    public GameObject m_user { get; set; }
 
     string m_buttonToWatch = "";
 
@@ -191,7 +191,10 @@ public class FlingableRock : MonoBehaviour
             && Physics.Raycast(m_collider.bounds.center, -Vector3.up, out hit, m_collider.bounds.extents.y + 0.1f))
         {
             string thisName = hit.collider.gameObject.name;
-            string thatName = m_user.getCurrentGround().name;
+			BasicMovement movement = m_user.GetComponent<BasicMovement>();
+			GameObject currentGround = movement.getCurrentGround();
+			if (currentGround == null) return false;
+            string thatName = currentGround.name;
 //             Debug.Log("thisName=" + thisName);
 //             Debug.Log("thatName=" + thatName);
             return thisName.Contains(thatName);
@@ -206,7 +209,9 @@ public class FlingableRock : MonoBehaviour
             && Physics.Raycast(m_collider.bounds.center, -Vector3.up, out hit, m_collider.bounds.extents.y + 0.1f))
         {
             string thisName = hit.collider.gameObject.name;
-            string thatName = _user.getCurrentGround().name;
+			GameObject currentGround = _user.getCurrentGround();
+			if (currentGround == null) return false;
+            string thatName = currentGround.name;
             //             Debug.Log("thisName=" + thisName);
             //             Debug.Log("thatName=" + thatName);
             return thisName.Contains(thatName);
@@ -232,7 +237,15 @@ public class FlingableRock : MonoBehaviour
             m_heightToReach = transform.position.y + m_size.y;
     }
 
-    public void setUser(string _playerID)
+	public void setUser(GameObject user) {
+		if (user == null) {
+			Debug.Log("OK");
+		}
+
+		m_user = user;
+	}
+
+    /*public void setUser(string _playerID)
     {
         GameObject[] gos = GameObject.FindGameObjectsWithTag("Player");
 
@@ -244,7 +257,7 @@ public class FlingableRock : MonoBehaviour
 				break;
 			}
         }
-    }
+    }*/
 
 	/*if (go.GetComponent<BasicAI>() != null && go.GetComponent<CharacterMovement>().m_username.Equals(_playerID)) {
 		m_user = go.GetComponent<CharacterMovementEarth>();
@@ -297,7 +310,13 @@ public class FlingableRock : MonoBehaviour
 
     float getDistanceRatio()
     {
-        float ratio = m_user.m_OffsetForwardEarth / Vector3.Distance(transform.position, m_user.transform.position);
+		if (m_user == null)
+		{
+			int i = 0;
+			++i;
+		}
+
+        float ratio = m_user.GetComponent<EarthAttack>().m_OffsetForwardEarth / Vector3.Distance(transform.position, m_user.transform.position);
         return Mathf.Min(4 * ratio, 1);
     }
 

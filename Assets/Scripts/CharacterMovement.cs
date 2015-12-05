@@ -39,9 +39,7 @@ public class CharacterMovement : MonoBehaviour
     public GameObject m_attack2Object;
     public GameObject m_attack3Object;
     public GameObject m_attack4Object;
-
-    public string m_username = "";
-
+	
     private bool m_cursorLocked;
 
     protected Collider m_collider;
