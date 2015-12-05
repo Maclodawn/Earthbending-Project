@@ -5,10 +5,14 @@ public class PowerComponent : MonoBehaviour {
 
     private float m_power;
 
+    [Header("Default")]
     public float StartingPower = 100;
     public float MaxPower = 100;
     public bool CanHaveNegativePower = false;
     public bool CanHaveMoreThanMaxPower = false;
+
+    [Header("Regeneration")]
+    public float RegenerationRate = 0;
 
     public delegate void PowerChangedEventHandler(object sender, float _oldPower, float _newPower);
     public event PowerChangedEventHandler PowerChanged;
@@ -16,6 +20,14 @@ public class PowerComponent : MonoBehaviour {
     void Start()
     {
         Power = StartingPower;
+    }
+
+    void Update()
+    {
+        if(RegenerationRate > 0)
+        {
+            Power += RegenerationRate * Time.deltaTime;
+        }
     }
 
     public bool HasMaxPower()

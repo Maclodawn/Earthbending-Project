@@ -48,6 +48,11 @@ public class Manager : MonoBehaviour
         {
             m_chargeBar.Setup(player.GetComponent<SpellChargingComponent>());
         }
+
+        if (m_UI != null && m_UI.GetComponent<BloodStain>() != null)
+        {
+            m_UI.GetComponent<BloodStain>().Setup(player.GetComponent<HealthComponent>());
+        }
     }
 
     void Update()
