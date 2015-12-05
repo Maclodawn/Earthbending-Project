@@ -10,6 +10,7 @@ public class BloodStain : MonoBehaviour {
 
     public List<UnityEngine.UI.Image> BloodStainBank = new List<UnityEngine.UI.Image>();
     public float HideRate = 0.5f;
+    public float HeavyDamageIndicator = 25;
 
     void Start()
     {
@@ -76,7 +77,7 @@ public class BloodStain : MonoBehaviour {
             return;
 
         var stain = GetAvailableBloodStain();
-        var alpha = Mathf.Lerp(0, 1, damage / 25);
+        var alpha = Mathf.Lerp(0, 1, damage / HeavyDamageIndicator);
         alpha = Mathf.Clamp01(alpha);
         stain.color = new Color(1, 1, 1, alpha);
     }
