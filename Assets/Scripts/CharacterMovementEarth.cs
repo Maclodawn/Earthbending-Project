@@ -19,6 +19,9 @@ public class CharacterMovementEarth : CharacterMovement
     // Update is called once per frame
     protected override void Update()
     {
+        if (m_pause)
+            return;
+
         base.Update();
     }
 

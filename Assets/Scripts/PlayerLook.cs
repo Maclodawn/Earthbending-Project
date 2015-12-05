@@ -3,6 +3,7 @@ using System.Collections;
 
 public class PlayerLook : MonoBehaviour
 {
+    private bool m_pause = false;
 
     public GameObject m_target;
     public GameObject m_targetHead;
@@ -20,6 +21,9 @@ public class PlayerLook : MonoBehaviour
 	
 	void LateUpdate ()
     {
+        if (m_pause)
+            return;
+
         float horizontal = Input.GetAxis("Mouse X") * m_rotateSpeed.x;
         float vertical = Input.GetAxis("Mouse Y") * m_rotateSpeed.y;
         
@@ -37,4 +41,13 @@ public class PlayerLook : MonoBehaviour
             transform.position = new Vector3(hit.point.x, hit.point.y, hit.point.z);
         }
 	}
+
+    void ReceiveMessage(string msg)
+    {
+        string str = msg as string;
+        if (str == "Pause")
+            m_pause = true;
+        else if (str == "UnPause")
+            m_pause = false;
+    }
 }

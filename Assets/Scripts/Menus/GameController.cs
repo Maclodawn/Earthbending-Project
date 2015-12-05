@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameController : MonoBehaviour {
 
@@ -7,7 +8,9 @@ public class GameController : MonoBehaviour {
     {
         SHOW_SPLASHSCREEN,
         ASK_ENTER,
-        SHOW_MENU
+        SHOW_MENU,
+        SHOW_OPTION_MENU,
+        SHOW_START_MENU,
     }
 
     private State CurrentState;
@@ -28,10 +31,13 @@ public class GameController : MonoBehaviour {
     private float AskEnterTimer = 0;
     private bool AE_StartFadeOut = false;
 
-    [Header("Main Menu")]
-    // public UnityEngine.UI.Button StartButton;
-    // public UnityEngine.UI.Button ExitButton;
-    public GameObject ButtonParent;
+    [Header("Menu")]
+    public GameObject MainMenu;
+    public GameObject StartSubMenu;
+    public GameObject OptionSubMenu;
+
+    [Header("Misc")]
+    public UnityEngine.UI.InputField MapName;
 
 	// Use this for initialization
 	void Start () {
@@ -76,6 +82,7 @@ public class GameController : MonoBehaviour {
                 break;
 
             default:
+                CurrentState = newState;
                 break;
         }
     }
@@ -84,7 +91,7 @@ public class GameController : MonoBehaviour {
     {
         SplashScreen.gameObject.SetActive(false);
         AskEnter.gameObject.SetActive(false);
-        ButtonParent.SetActive(false);
+        MainMenu.SetActive(false);
     }
 
     void InitSplashScreenMode()
@@ -110,9 +117,9 @@ public class GameController : MonoBehaviour {
 
     void InitShowMenuMode()
     {
-        if(ButtonParent != null)
+        if (MainMenu != null)
         {
-            ButtonParent.SetActive(false);
+            MainMenu.SetActive(false);
         }
     }
 
@@ -121,7 +128,7 @@ public class GameController : MonoBehaviour {
         if (SplashScreen == null)
             return;
 
-        if(Input.GetButton("Submit"))
+        if (Input.GetButtonDown("Submit"))
         {
             InitSplashScreenMode();
             SwitchState(State.ASK_ENTER);
@@ -151,7 +158,7 @@ public class GameController : MonoBehaviour {
 
     void UpdateAskEnter(float dt)
     {
-        if (!AE_StartFadeOut && Input.GetButton("Submit"))
+        if (!AE_StartFadeOut && Input.GetButtonDown("Submit"))
         {
             AE_StartFadeOut = true;
             AskEnterTimer = 0;
@@ -181,10 +188,9 @@ public class GameController : MonoBehaviour {
 
     void UpdateShowMenuMode()
     {
-        if (!ButtonParent.activeSelf)
+        if (!MainMenu.activeSelf)
         {
-            Debug.Log("Button.activeSelf==false");
-            ButtonParent.SetActive(true);
+            MainMenu.SetActive(true);
         }
     }
 
@@ -199,6 +205,48 @@ public class GameController : MonoBehaviour {
         if(command == "Exit")
         {
             Application.Quit();
+        }
+
+        if(command == "ShowStartSubMenu")
+        {
+            SwitchState(State.SHOW_START_MENU);
+            MainMenu.SetActive(false);
+            StartSubMenu.SetActive(true);
+        }
+
+        if(command == "ShowOptionsSubMenu")
+        {
+            SwitchState(State.SHOW_OPTION_MENU);
+            MainMenu.SetActive(false);
+            OptionSubMenu.SetActive(true);
+        }
+
+        if (command == "Back")
+        {
+            OnBackClicked();
+        }
+
+        if(command == "LoadMap")
+        {
+            Application.LoadLevel(MapName.text);
+        }
+    }
+
+    public void OnBackClicked()
+    {
+        switch(CurrentState)
+        {
+            case State.SHOW_OPTION_MENU:
+                OptionSubMenu.SetActive(false);
+                MainMenu.SetActive(true);
+                break;
+            case State.SHOW_START_MENU:
+                StartSubMenu.SetActive(false);
+                MainMenu.SetActive(true);
+                break;
+
+            default:
+                break;
         }
     }
 }
