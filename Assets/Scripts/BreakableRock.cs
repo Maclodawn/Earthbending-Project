@@ -19,7 +19,9 @@ public class BreakableRock : MonoBehaviour
     [SerializeField]
     List<GameObject> m_pieceList;
 
+#pragma warning disable 0414 // Assigned but never used as it is used only in children classes
     Transform m_base;
+#pragma warning restore 0414
 
     // Use this for initialization
     protected virtual void Start()

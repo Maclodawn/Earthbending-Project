@@ -81,15 +81,26 @@ public class CharacterMovementEarth : CharacterMovement
         {
             bullet = findBullet();
             if (!bullet)
+            {
                 spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
+            }
             else
             {
+//                 GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+//                 sphere.transform.position = transform.position;
+//                 sphere.transform.localScale = new Vector3(1, 1, 1) * m_rangeToTakeBullet;
+//                 sphere.GetComponent<SphereCollider>().enabled = false;
+
+//                UnityEditor.EditorApplication.isPaused = true;
+
                 bullet.setUser(m_username);
                 bullet.fling("Fire1", m_attack1ForceUp, m_attack1ForceForward, false);
             }
         }
         else
+        {
             spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
+        }
 
         m_executingAtk1 = true;
     }
