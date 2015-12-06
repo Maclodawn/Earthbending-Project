@@ -104,7 +104,8 @@ public class FlingableRock : MonoBehaviour
             fire = Input.GetButton(m_buttonToWatch);
 		} else if (m_user != null) {
 			AI = true;
-			fire = m_user.GetComponent<AIAttackLauncher>().getAtk() == 0;
+			fire = m_user.GetComponent<AIAttackLauncher>().isKey();
+			//fire = m_user.GetComponent<AIAttackLauncher>().getAtk() == 0;
 		}
 
         m_forceTotal = m_gravityForce;
