@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class FlingableRock : MonoBehaviour
 {
@@ -38,7 +39,14 @@ public class FlingableRock : MonoBehaviour
 
     public bool m_alreadyInTheWorld = false;
 
+    List<Vector3> m_previousPos = new List<Vector3>();
+
     bool fire = false;
+    bool fireCheat = false;
+    BulletLauncher launcher;
+
+    // 2700 is the average density of a rock Cf. http://www.les-mathematiques.net/phorum/read.php?2,49845
+    float m_density = 2700;
 
 	public float getHeightToReach() {
 		return m_heightToReach;
@@ -54,6 +62,8 @@ public class FlingableRock : MonoBehaviour
     {
         updateSize();
         m_gravityForce = m_rigidBody.mass * Physics.gravity;
+        m_previousPos.Add(Vector3.zero);
+        m_previousPos.Add(Vector3.zero);
         if (m_alreadyInTheWorld)
             setStateAvailable();
     }
@@ -68,7 +78,9 @@ public class FlingableRock : MonoBehaviour
         m_risingDone = false;
         m_flingDone = false;
         m_isUnderground = true;
-        if (m_user != null)
+        if (launcher)
+            m_heightToReach = launcher.transform.position.y + m_size.y;
+        else if (m_user != null)
 			m_heightToReach = m_user.transform.position.y + m_size.y;
 		else
 			m_heightToReach = 1f + m_size.y;
@@ -76,9 +88,67 @@ public class FlingableRock : MonoBehaviour
         m_forceForward = _forceForward;
     }
 
-    protected virtual void OnCollisionEnter(Collision col)
+    protected virtual void OnCollisionEnter(Collision collision)
     {
-        m_rigidBody.AddExplosionForce(m_collisionExplosionForce, m_rigidBody.position, m_collisionExplosionRadius);
+//         float volume = m_rigidBody.mass / m_density;
+//         float radius = 3 * volume / (4 * Mathf.PI);
+//         m_rigidBody.AddExplosionForce(, m_rigidBody.position, radius);
+
+        if (!collision.gameObject.GetComponent<Terrain>())
+        {
+            Ray ray = new Ray(m_previousPos[1], transform.position - m_previousPos[1]);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit))
+    {
+                //Debug.DrawLine(ray.origin, hit.point, Color.yellow);
+//                 GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+//                 go.transform.localScale /= 5;
+//                 go.transform.position = transform.position;
+//                 go.GetComponent<MeshRenderer>().material.color = Color.blue;
+//                 go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+//                 go.transform.localScale /= 5;
+//                 go.transform.position = m_previousPos[0];
+//                 go.GetComponent<MeshRenderer>().material.color = Color.cyan;
+//                 go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+//                 go.transform.localScale /= 5;
+//                 go.transform.position = m_previousPos[1];
+//                 go.GetComponent<MeshRenderer>().material.color = Color.green;
+//                 go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+//                 go.transform.localScale /= 5;
+//                 go.transform.position = hit.point;
+//                 go.GetComponent<MeshRenderer>().material.color = Color.yellow;
+                Vector3 newPos = hit.point - new Vector3(m_size.x * m_rigidBody.velocity.normalized.x / 2,
+                                                             m_size.y * m_rigidBody.velocity.normalized.y / 2,
+                                                             m_size.z * m_rigidBody.velocity.normalized.z / 2);
+                //Debug.DrawLine(hit.point, newPos, Color.white);
+                transform.position = newPos;
+                m_previousPos[0] = newPos;
+
+                
+                if (!collision.gameObject.GetComponent<Rigidbody>())
+    {
+                    CharacterMovement collidingObject = collision.gameObject.GetComponent<CharacterMovement>();
+                    Vector3 vect = getVelocity() - collidingObject.getVelocity();
+
+                    Vector3 velocity1Final = (collidingObject.m_mass / (getMass() + collidingObject.m_mass)) * vect;
+                    velocity1Final = velocity1Final.magnitude * collision.contacts[0].normal;
+
+                    Vector3 velocity2Final = (-getMass() / (getMass() + collidingObject.m_mass)) * vect;
+                    velocity2Final = velocity2Final.magnitude * -collision.contacts[0].normal;
+
+                    Debug.DrawRay(collidingObject.transform.position, collidingObject.getVelocity(), Color.blue);
+                    Debug.DrawRay(transform.position, getVelocity(), Color.green);
+                    Debug.DrawRay(collidingObject.transform.position, velocity2Final, Color.cyan);
+                    Debug.DrawRay(transform.position, velocity1Final, Color.red);
+                    //UnityEditor.EditorApplication.isPaused = true;
+
+                    setVelocity(velocity1Final);
+                    collidingObject.setVelocity(velocity2Final);
+// 
+//                     collidingObject.setOnControllerColliderHitAlreadyCalled();
+                }
+            }
+        }
 
         if (m_rigidBody.velocity.magnitude >= m_minVelocityDestruction)
         {
@@ -97,7 +167,6 @@ public class FlingableRock : MonoBehaviour
             Destroy(this.gameObject);
         }
 
-        // For debugging
 		fire = m_launcher.isKey();
 
         m_forceTotal = m_gravityForce;
@@ -171,6 +240,7 @@ public class FlingableRock : MonoBehaviour
                 stabilize();
                 m_flingDone = true;
                 m_user = null;
+                launcher = null;
             }
         }
 
@@ -189,6 +259,8 @@ public class FlingableRock : MonoBehaviour
 
         m_rigidBody.AddForce(m_forceTotal);
         m_wasUnderground = m_isUnderground;
+        m_previousPos[1] = m_previousPos[0];
+        m_previousPos[0] = transform.position;
     }
 
     bool isGrounded()
@@ -296,8 +368,7 @@ public class FlingableRock : MonoBehaviour
         }
 
         float volume = MeshVolumeHelper.VolumeOfObject(gameObject);
-        // 2700 is the average density of a rock Cf. http://www.les-mathematiques.net/phorum/read.php?2,49845
-        m_rigidBody.mass = volume * 2700;
+        m_rigidBody.mass = volume * m_density;
     }
 
     void rise()
@@ -307,33 +378,49 @@ public class FlingableRock : MonoBehaviour
 
     void stabilize()
     {
-        if (transform.position.y < m_heightToReach || transform.position.y > m_heightToReach + 0.05f)
+        fireCheat = false;
+
+        if (m_rigidBody.velocity.x > 0.05f || m_rigidBody.velocity.y > 0.05f)
         {
-            Vector3 v1 = (new Vector3(0, m_heightToReach, 0) - new Vector3(0, transform.position.y, 0)) / 0.05f;
-            Vector3 force = m_rigidBody.mass * ((v1 - m_rigidBody.velocity) / 0.05f);
-            m_forceTotal += (force - m_gravityForce) * getDistanceRatio();
+            Vector3 force = m_rigidBody.mass * -m_rigidBody.velocity / 0.05f;
+            force = new Vector3(force.x, 0, force.z);
+            if (force.magnitude >= m_forceForward)
+                m_forceTotal += m_forward * m_forceForward;
+            else
+                m_forceTotal += force;
         }
         else
         {
             Vector3 force = m_rigidBody.mass * (-m_rigidBody.velocity / 0.05f);
-            m_forceTotal += (force - m_gravityForce) * getDistanceRatio();
+            m_forceTotal += new Vector3(force.x, 0, force.z) * getDistanceRatio();
+        }
+
+        if (transform.position.y < m_heightToReach || transform.position.y > m_heightToReach + 0.05f)
+        {
+            Vector3 v1 = (new Vector3(0, m_heightToReach, 0) - new Vector3(0, transform.position.y, 0)) / 0.05f;
+            Vector3 force = m_rigidBody.mass * (v1 - m_rigidBody.velocity) / 0.05f;
+            m_forceTotal += (Vector3.up * force.y - m_gravityForce) * getDistanceRatio();
+        }
+        else
+        {
+            Vector3 force = m_rigidBody.mass * (-m_rigidBody.velocity / 0.05f);
+            m_forceTotal += (Vector3.up * force.y - m_gravityForce) * getDistanceRatio();
         }
     }
 
     float getDistanceRatio()
     {
-		if (m_user != null)
-        {
-            float ratio = m_user.GetComponent<EarthAttack>().m_OffsetForwardEarth / Vector3.Distance(transform.position, m_user.transform.position);
-            return Mathf.Min(4 * ratio, 1);
-        }
-        else
-        {
-            return 9999;
-        }
+        float ratio = m_user.GetComponent<EarthAttack>().m_OffsetForwardEarth / Vector3.Distance(transform.position, m_user.transform.position);
+        return Mathf.Min(4 * ratio, 1);
     }
 
     float getDistanceRatio(CharacterMovementEarth _user)
+    {
+        float ratio = _user.m_OffsetForwardEarth / Vector3.Distance(transform.position, _user.transform.position);
+        return Mathf.Min(4 * ratio, 1);
+    }
+
+    float getDistanceRatio(BulletLauncher _user)
     {
         float ratio = _user.m_OffsetForwardEarth / Vector3.Distance(transform.position, _user.transform.position);
         return Mathf.Min(4 * ratio, 1);
@@ -346,6 +433,7 @@ public class FlingableRock : MonoBehaviour
         m_risingDone = true;
         m_flingDone = true;
         m_user = null;
+        launcher = null;
     }
 
     public bool canRiseInMinTime(float timeToRise, CharacterMovementEarth user)
@@ -370,5 +458,44 @@ public class FlingableRock : MonoBehaviour
         }
 
         return transform.position.y + heightTraveled >= m_heightToReach;
+    }
+
+    public bool canRiseInMinTime(float timeToRise, BulletLauncher user)
+    {
+        if (!isOnTheSameGroundOfTheUser())
+            m_heightToReach = transform.position.y;
+        else
+            m_heightToReach = transform.position.y + m_size.y;
+
+        int nbFrameToDo = (int)(timeToRise / Time.deltaTime);
+        float timePerFrame = timeToRise / nbFrameToDo;
+        Vector3 force = m_gravityForce + Vector3.up * m_forceUp * getDistanceRatio(user);
+        Vector3 acceleration = force / m_rigidBody.mass;
+
+        float heightTraveled = 0;
+        float speed = 0;
+
+        for (int i = 0; i < nbFrameToDo; ++i)
+        {
+            speed += acceleration.y * timePerFrame;
+            heightTraveled += speed * timePerFrame;
+        }
+
+        return transform.position.y + heightTraveled >= m_heightToReach;
+    }
+
+    public Vector3 getVelocity()
+    {
+        return m_rigidBody.velocity;
+    }
+
+    public void setVelocity(Vector3 _velocity)
+    {
+        m_rigidBody.velocity = _velocity;
+    }
+
+    public float getMass()
+    {
+        return m_rigidBody.mass;
     }
 }

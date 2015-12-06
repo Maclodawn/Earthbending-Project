@@ -14,6 +14,7 @@ public class CharacterMovement : MonoBehaviour
     public float m_crouchSpeed = 1.0f;
     public float m_jumpSpeed = 20.0f;
 
+    public float m_mass = 80;
     public float m_smoothMovement = 0.1f;
     protected float m_addSpeed = 0;
     protected float m_gravity = 1.0f;
@@ -46,8 +47,12 @@ public class CharacterMovement : MonoBehaviour
 
     protected Collider m_collider;
 
+    bool m_tookAHit = false;
+    Vector3 m_velocityHit;
+    [SerializeField]
+    float m_speedFrictionHit;
 
-    public string m_username = "";
+//    bool m_onControllerColliderHitAlreadyCalled = false;
 
     // Use this for initialization
     public void init(Manager _manager)
@@ -68,6 +73,14 @@ public class CharacterMovement : MonoBehaviour
     {
         if (m_pause)
             return;
+
+        if (m_tookAHit)
+        {
+            if (Input.GetButton("Jump"))
+                m_tookAHit = false;
+            else
+                return;
+        }
 
         // -------------------------------------Attack----------------------------------------------
         attack();
@@ -230,11 +243,46 @@ public class CharacterMovement : MonoBehaviour
         if (m_pause)
             return;
 
+//        m_onControllerColliderHitAlreadyCalled = false;
         // --------------------------------------------Move --------------------------------------------------
         Vector3 direction = transform.forward * m_forwardSpeed + transform.right * m_rightSpeed;
         direction.y = m_yVelocity;
-        m_controller.Move(direction * Time.deltaTime);
+        m_controller.Move(direction * Time.fixedDeltaTime);
         // --------------------------------------------End move --------------------------------------------------
+
+        // --------------------------------------------Take a hit --------------------------------------------------
+        if (!m_tookAHit)
+            return;
+
+        Vector3 speed = m_velocityHit;
+
+        if (m_controller.isGrounded)
+        {
+            m_yVelocity = 0;
+            m_velocityHit.y = 0;
+        }
+        else
+            m_yVelocity -= m_gravity;
+
+        speed += Vector3.up * m_yVelocity;
+        
+        if (m_controller.isGrounded && m_speedFrictionHit != 0)
+        {
+            Vector3 friction = -speed.normalized * m_speedFrictionHit;
+            if (Mathf.Sign(speed.x + friction.x) != Mathf.Sign(speed.x))
+                speed = Vector3.zero;
+            else
+            {
+                speed += friction;
+                m_velocityHit += friction;
+            }
+        }
+
+        if (speed.magnitude < 1)
+            m_tookAHit = false;
+
+        m_controller.Move(speed * Time.fixedDeltaTime);
+        // --------------------------------------------End take a hit --------------------------------------------------
     }
 
     protected virtual void attack()
@@ -307,4 +355,45 @@ public class CharacterMovement : MonoBehaviour
                 m_pause = false;
         }
     }
+
+    public Vector3 getVelocity()
+    {
+        //return transform.forward * m_forwardSpeed + transform.right * m_rightSpeed + Vector3.up * m_yVelocity;
+        return m_controller.velocity;
+    }
+
+    public void setVelocity(Vector3 _velocity)
+    {
+        m_tookAHit = true;
+        m_velocityHit = _velocity;
+    }
+
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (!hit.collider.gameObject.GetComponent<Terrain>())
+        {
+            int i = 0;
+            i++;
+        }
+//         if (!hit.collider.gameObject.GetComponent<Terrain>() && !m_onControllerColliderHitAlreadyCalled)
+//         {
+//             throw new System.Exception("OnControllerColliderHit call from CharacterController");
+//             FlingableRock collidingObject = hit.collider.gameObject.GetComponent<FlingableRock>();
+//             Vector3 vect = collidingObject.getVelocity() - getVelocity();
+// 
+//             Vector3 velocity1Final = (m_mass / (collidingObject.getMass() + m_mass)) * vect;
+//             velocity1Final = velocity1Final.magnitude * hit.normal;
+// 
+//             Vector3 velocity2Final = (-collidingObject.getMass() / (collidingObject.getMass() + m_mass)) * vect;
+//             velocity2Final = velocity2Final.magnitude * -hit.normal;
+// 
+//             collidingObject.setVelocity(velocity1Final);
+//             setVelocity(velocity2Final);
+//         }
+    }
+// 
+//     public void setOnControllerColliderHitAlreadyCalled()
+//     {
+//         m_onControllerColliderHitAlreadyCalled = true;
+//     }
 }
