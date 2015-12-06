@@ -3,7 +3,7 @@ using System.Collections;
 
 public abstract class AttackLauncher : MonoBehaviour {
 
-	private BasicAttack[] atks;
+	protected BasicAttack[] atks;
 	protected int atk = -1;
 	protected bool hold;
 
@@ -14,21 +14,11 @@ public abstract class AttackLauncher : MonoBehaviour {
 
 	protected abstract void updateInput();
 
-	public void Update() {
-		updateInput();
-
-		if (atk < 0 || atk > atks.Length || isBusy()) return;
-
-		atks[atk].executeAttack();
-
-		atk = -1;
-	}
-
 	public bool BasicAtkOnHold() {
 		return atk == 0 && hold;
 	}
 
-	private bool isBusy() {
+	protected bool isAnyBusy() {
 		foreach (BasicAttack a in atks) {
 			if (a.isBusy()) return true;
 		}

@@ -18,4 +18,14 @@ public class HumanAttackLauncher : AttackLauncher {
 				atk = 3;
 		}
 	}
+
+	public void Update() {
+		updateInput();
+		
+		if (atk < 0 || atk >= atks.Length || isAnyBusy()) return;
+		
+		atks[atk].executeAttack();
+		
+		atk = -1;
+	}
 }

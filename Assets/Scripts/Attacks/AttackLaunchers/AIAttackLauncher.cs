@@ -18,4 +18,14 @@ public class AIAttackLauncher : AttackLauncher {
 		if (atk == 0) hold = true;
 		else hold = false;
 	}
+
+	public void Update() {
+		updateInput();
+		
+		if (atk < 0 || atk >= atks.Length || isAnyBusy()) return;
+		
+		atks[atk].executeAttack();
+		
+		atk = -1;
+	}
 }
