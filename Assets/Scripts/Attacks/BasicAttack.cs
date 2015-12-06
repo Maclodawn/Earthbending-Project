@@ -14,6 +14,10 @@ public abstract class BasicAttack : MonoBehaviour {
 		return timer < WAIT_TIME();
 	}
 
+	public virtual bool isFinished() {
+		return true;
+	}
+
 	protected abstract void updateMe();
 	protected abstract float WAIT_TIME();
 }

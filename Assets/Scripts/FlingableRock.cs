@@ -41,6 +41,10 @@ public class FlingableRock : MonoBehaviour
 
     bool fire = false;
 
+	public float getHeightToReach() {
+		return m_heightToReach;
+	}
+
     void Awake()
     {
         m_rigidBody = GetComponent<Rigidbody>();
@@ -86,6 +90,8 @@ public class FlingableRock : MonoBehaviour
 
     virtual protected void FixedUpdate()
     {
+		bool AI = false;
+
         // Cheat
         if (Input.GetKeyDown(KeyCode.A))
         {
@@ -93,8 +99,13 @@ public class FlingableRock : MonoBehaviour
         }
 
         // For debugging
-        if (/*!fire &&*/ m_buttonToWatch.Length != 0)
+        if (/*!fire &&*/ m_buttonToWatch.Length != 0) {
+			AI = false;
             fire = Input.GetButton(m_buttonToWatch);
+		} else if (m_user != null) {
+			AI = true;
+			fire = m_user.GetComponent<AIAttackLauncher>().getAtk() == 0;
+		}
 
         m_forceTotal = m_gravityForce;
 
@@ -118,7 +129,7 @@ public class FlingableRock : MonoBehaviour
             rise();
             m_risingStarted = true;
         }
-        else if (!m_risingDone && !heightReached && m_buttonToWatch.Length != 0 && fire)
+        else if (!m_risingDone && !heightReached && fire)
         {
             rise();
         }
@@ -131,7 +142,7 @@ public class FlingableRock : MonoBehaviour
             m_rigidBody.velocity = new Vector3(m_rigidBody.velocity.x, 0.0f, m_rigidBody.velocity.z);
             m_risingDone = true;
         }
-        else if (m_risingDone && !m_flingDone && m_buttonToWatch.Length != 0)
+        else if (m_risingDone && !m_flingDone)
         {
             if (fire)
                 stabilize();

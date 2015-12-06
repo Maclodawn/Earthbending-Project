@@ -5,7 +5,8 @@ using System.Collections.Generic;
 public class RockBulletAttack : EarthAttack {
 
 	public GameObject rockBullet;
-
+	public FlingableRock myCurrentBullet;
+	
     [SerializeField]
     float m_rangeToTakeBullet = 15.0f;
 	
@@ -32,7 +33,11 @@ public class RockBulletAttack : EarthAttack {
 		return 0.3f;
 	}
 
-	// ---
+	public override bool isFinished() {
+		return myCurrentBullet == null ||
+			  (myCurrentBullet != null
+			  && myCurrentBullet.transform.position.y >= myCurrentBullet.getHeightToReach());
+	}
 
 	private void attack1() {
 		Collider[] colliders = Physics.OverlapSphere(transform.position, m_rangeToTakeBullet);
@@ -42,15 +47,16 @@ public class RockBulletAttack : EarthAttack {
 		{
 			bullet = findBullet(colliders);
 			if (!bullet)
-				spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
+				spawnAndFlingBullet("", m_attack1ForceUp, m_attack1ForceForward);
 			else
 			{
 				bullet.setUser(gameObject);
-				bullet.fling("Fire1", m_attack1ForceUp, m_attack1ForceForward, false);
+				myCurrentBullet = bullet;
+				bullet.fling("", m_attack1ForceUp, m_attack1ForceForward, false);
 			}
 		}
 		else
-			spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
+			spawnAndFlingBullet("", m_attack1ForceUp, m_attack1ForceForward);
 	}
 
 	// ---
@@ -97,6 +103,7 @@ public class RockBulletAttack : EarthAttack {
 			
 			FlingableRock tmpBullet = ((GameObject)Instantiate(rockBullet, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
 			tmpBullet.setUser(gameObject);
+			myCurrentBullet = tmpBullet;
 			tmpBullet.init(_buttonToWatch, _forceUp, _forceForward);
 		}
 	}
