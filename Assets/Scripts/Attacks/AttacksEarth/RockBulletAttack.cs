@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class RockBulletAttack : EarthAttack {
 
 	public GameObject rockBullet;
+	private FlingableRock myCurrentBullet;
 
     [SerializeField]
     float m_rangeToTakeBullet = 15.0f;
@@ -19,25 +20,35 @@ public class RockBulletAttack : EarthAttack {
 		return 0.3f;
 	}
 
+	public override bool isFinished() {
+		return myCurrentBullet == null ||
+			(myCurrentBullet != null
+			&& myCurrentBullet.transform.position.y >= myCurrentBullet.getHeightToReach());
+	}
+
+	public void DropBullet() {
+		myCurrentBullet = null;
+	}
+
 	// ---
 
 	private void attack1() {
 		Collider[] colliders = Physics.OverlapSphere(transform.position, m_rangeToTakeBullet);
-		FlingableRock bullet = null;
+		myCurrentBullet = null;
 		
 		if (colliders.Length > 0)
 		{
-			bullet = findBullet(colliders);
-			if (!bullet)
-				spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
+			myCurrentBullet = findBullet(colliders);
+			if (!myCurrentBullet)
+				spawnAndFlingBullet(gameObject, m_attack1ForceUp, m_attack1ForceForward);
 			else
 			{
-				bullet.setUser(gameObject);
-				bullet.fling("Fire1", m_attack1ForceUp, m_attack1ForceForward, false);
+				myCurrentBullet.setUser(gameObject);
+				myCurrentBullet.fling(gameObject, m_attack1ForceUp, m_attack1ForceForward, false);
 			}
 		}
 		else
-			spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
+			spawnAndFlingBullet(gameObject, m_attack1ForceUp, m_attack1ForceForward);
 	}
 
 	// ---
@@ -52,7 +63,7 @@ public class RockBulletAttack : EarthAttack {
 			
 			if (rock != null)
 			{
-				if (rock.m_user != null)
+				if (rock.m_user != gameObject && rock.m_user != null)
 					continue;
 				
 				float distance = Vector3.Distance(transform.position, rock.transform.position);
@@ -70,7 +81,7 @@ public class RockBulletAttack : EarthAttack {
 			return colliders[closerOne].GetComponent<FlingableRock>();
 	}
 	
-	private void spawnAndFlingBullet(string _buttonToWatch, float _forceUp, float _forceForward) {
+	private void spawnAndFlingBullet(GameObject _user, float _forceUp, float _forceForward) {
 		Vector3 spawnProjectile = transform.position + transform.forward * m_OffsetForwardEarth;
 		RaycastHit hit;
 		if (Physics.Raycast(spawnProjectile, -Vector3.up, out hit, 50))
@@ -84,7 +95,8 @@ public class RockBulletAttack : EarthAttack {
 			
 			FlingableRock tmpBullet = ((GameObject)Instantiate(rockBullet, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
 			tmpBullet.setUser(gameObject);
-			tmpBullet.init(_buttonToWatch, _forceUp, _forceForward);
+			tmpBullet.init(_user, _forceUp, _forceForward);
+			myCurrentBullet = tmpBullet;
 		}
 	}
 }

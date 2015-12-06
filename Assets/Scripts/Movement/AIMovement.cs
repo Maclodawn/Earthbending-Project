@@ -4,6 +4,14 @@ using System.Collections;
 public class AIMovement : BasicMovement {
 
 	protected override void updateInput() {
+		AttackLauncher attackLauncher = GetComponent<AttackLauncher>();
+		if (attackLauncher == null || attackLauncher.BasicAtkOnHold()) {
+			input = Vector2.zero;
+			jump = false;
+			sprint = false;
+			return;
+		}
+
 		float degrees = Random.Range(-15f, 15f);
 		transform.Rotate(0f, degrees, 0f);
 		input.x = -Mathf.Sin(degrees*Mathf.Deg2Rad);

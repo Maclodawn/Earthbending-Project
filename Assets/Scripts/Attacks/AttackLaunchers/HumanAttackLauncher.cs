@@ -7,7 +7,10 @@ public class HumanAttackLauncher : AttackLauncher {
 		if (Input.GetButtonDown("Fire1")) {
 			atk = 0;
 			hold = true;
-		} else hold = false;
+		}
+
+		if (Input.GetButtonUp("Fire1"))
+			hold = false;
 		
 		if (Input.GetButtonDown("Fire2")) {
 			if (Input.GetKey(KeyCode.S))

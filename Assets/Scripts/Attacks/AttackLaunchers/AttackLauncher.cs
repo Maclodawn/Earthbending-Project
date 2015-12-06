@@ -3,9 +3,9 @@ using System.Collections;
 
 public abstract class AttackLauncher : MonoBehaviour {
 
-	private BasicAttack[] atks;
+	protected BasicAttack[] atks;
 	protected int atk = -1;
-	protected bool hold;
+	protected bool hold, old_hold = false;
 
 	// map here type of attacks to ids
 	public void Start() {
@@ -19,15 +19,27 @@ public abstract class AttackLauncher : MonoBehaviour {
 
 		if (atk < 0 || atk > atks.Length || isBusy()) return;
 
-		atks[atk].executeAttack();
+//		if (atk == 0 || hold) {
+//			hold = !atks[0].isThrowable();
+//		} else hold = false;
+
+		if (old_hold == false)
+			Debug.Log("ok");
+
+		if (atk == 0 && hold && !old_hold)
+			atks[0].executeAttack();
+		else if (atk != 0)
+			atks[atk].executeAttack();
 
 		atk = -1;
+		old_hold = hold;
 	}
 
 	public bool BasicAtkOnHold() {
-		return atk == 0 && hold;
+		return hold;
 	}
 
+	// animation checking
 	private bool isBusy() {
 		foreach (BasicAttack a in atks) {
 			if (a.isBusy()) return true;

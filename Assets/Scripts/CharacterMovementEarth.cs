@@ -81,15 +81,15 @@ public class CharacterMovementEarth : CharacterMovement
         {
             bullet = findBullet();
             if (!bullet)
-                spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
+                spawnAndFlingBullet(gameObject, m_attack1ForceUp, m_attack1ForceForward);
             else
             {
                 bullet.setUser(gameObject);
-                bullet.fling("Fire1", m_attack1ForceUp, m_attack1ForceForward, false);
+                bullet.fling(gameObject, m_attack1ForceUp, m_attack1ForceForward, false);
             }
         }
         else
-            spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
+            spawnAndFlingBullet(gameObject, m_attack1ForceUp, m_attack1ForceForward);
 
         m_executingAtk1 = true;
     }
@@ -130,7 +130,7 @@ public class CharacterMovementEarth : CharacterMovement
         }
     }
 
-    void spawnAndFlingBullet(string _buttonToWatch, float _forceUp, float _forceForward)
+    void spawnAndFlingBullet(GameObject _user, float _forceUp, float _forceForward)
     {
         Vector3 spawnProjectile = transform.position + transform.forward * m_OffsetForwardEarth;
         RaycastHit hit;
@@ -144,7 +144,7 @@ public class CharacterMovementEarth : CharacterMovement
 
             FlingableRock tmpBullet = ((GameObject)Instantiate(m_attack1Object, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
             tmpBullet.setUser(gameObject);
-            tmpBullet.init(_buttonToWatch, _forceUp, _forceForward);
+			tmpBullet.init(_user, _forceUp, _forceForward);
         }
     }
 
@@ -158,7 +158,7 @@ public class CharacterMovementEarth : CharacterMovement
 
         if (collided && breakableRock != null)
         {
-            breakableRock.breakRock(gameObject, "Fire2", m_attack1ForceUp, m_attack1ForceForward);
+            breakableRock.breakRock(gameObject, m_attack1ForceUp, m_attack1ForceForward);
         }
         else
         {
@@ -196,7 +196,7 @@ public class CharacterMovementEarth : CharacterMovement
         {
             if (collided && breakableRock != null)
             {
-                breakableRock.breakRock(gameObject, "Fire2", m_attack1ForceUp, m_attack1ForceForward);
+                breakableRock.breakRock(gameObject, m_attack1ForceUp, m_attack1ForceForward);
             }
             else
             {
@@ -228,7 +228,7 @@ public class CharacterMovementEarth : CharacterMovement
         {
             if (collided && breakableRock != null)
             {
-                breakableRock.breakRock(gameObject, "Fire2", m_attack1ForceUp, m_attack1ForceForward);
+                breakableRock.breakRock(gameObject, m_attack1ForceUp, m_attack1ForceForward);
             }
             else
             {

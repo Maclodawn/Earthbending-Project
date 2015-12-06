@@ -2,20 +2,16 @@
 using System.Collections;
 
 public class AIAttackLauncher : AttackLauncher {
-
-	protected static float HOLD_TIME = 0.4f;
-	protected float heldTime = 0f;
-
+	
 	protected override void updateInput() {
-		if (hold && heldTime < HOLD_TIME) {
+		//TODO AI thinking here
+		atk = 0; //(Random.Range(0, 11) > 9) ? 0 : -1;
+
+		if (hold) {
+			bool tmp = atks[0].isFinished();
+			if (tmp)
+				hold = false;
+		} else if (atk == 0)
 			hold = true;
-			heldTime += Time.deltaTime;
-		}
-
-		//TODO AI thinking
-		atk = 0;
-
-		if (atk == 0) hold = true;
-		else hold = false;
 	}
 }

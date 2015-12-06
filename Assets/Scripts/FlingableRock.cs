@@ -12,7 +12,7 @@ public class FlingableRock : MonoBehaviour
 
     Vector3 m_gravityForce;
     Vector3 m_size;
-    float m_heightToReach;
+	float m_heightToReach;
     Vector3 m_forceTotal;
     Vector3 m_forward;
 
@@ -35,11 +35,13 @@ public class FlingableRock : MonoBehaviour
 
     public GameObject m_user { get; set; }
 
-    string m_buttonToWatch = "";
-
     public bool m_alreadyInTheWorld = false;
 
     bool fire = false;
+
+	public float getHeightToReach() {
+		return m_heightToReach;
+	}
 
     void Awake()
     {
@@ -58,17 +60,14 @@ public class FlingableRock : MonoBehaviour
     // Use this for initialization
     // init() method has been created instead of Start() method to be able to
     // initialize the bullet when it is used again by a character
-    virtual public void init(string _buttonToWatch, float _forceUp, float _forceForward)
+    virtual public void init(GameObject _user, float _forceUp, float _forceForward)
     {
-        m_buttonToWatch = _buttonToWatch;
+        m_user = _user;
         m_risingStarted = false;
         m_risingDone = false;
         m_flingDone = false;
         m_isUnderground = true;
-        if (m_user != null)
-			m_heightToReach = m_user.transform.position.y + m_size.y;
-		else
-			m_heightToReach = 1f + m_size.y;
+		m_heightToReach = m_user.transform.position.y + m_size.y;
         m_forceUp = _forceUp;
         m_forceForward = _forceForward;
     }
@@ -86,6 +85,14 @@ public class FlingableRock : MonoBehaviour
 
     virtual protected void FixedUpdate()
     {
+		RockBulletAttack rockBulletAttack = null;
+
+		if (m_user != null)
+			rockBulletAttack = m_user.GetComponent<RockBulletAttack>();
+
+		if (!rockBulletAttack)
+			Debug.Log("2");
+
         // Cheat
         if (Input.GetKeyDown(KeyCode.A))
         {
@@ -93,8 +100,13 @@ public class FlingableRock : MonoBehaviour
         }
 
         // For debugging
-        if (/*!fire &&*/ m_buttonToWatch.Length != 0)
-            fire = Input.GetButton(m_buttonToWatch);
+        //if (/*!fire &&*/ m_buttonToWatch.Length != 0)
+			//fire = Input.GetButton(m_buttonToWatch);
+
+		if (m_user != null) {
+			AttackLauncher attackLauncher = m_user.GetComponent<AttackLauncher>();
+			fire = (attackLauncher != null) ? attackLauncher.BasicAtkOnHold() : false;
+		}
 
         m_forceTotal = m_gravityForce;
 
@@ -118,7 +130,7 @@ public class FlingableRock : MonoBehaviour
             rise();
             m_risingStarted = true;
         }
-        else if (!m_risingDone && !heightReached && m_buttonToWatch.Length != 0 && fire)
+        else if (!m_risingDone && !heightReached /*&& m_buttonToWatch.Length != 0*/ && fire)
         {
             rise();
         }
@@ -131,7 +143,7 @@ public class FlingableRock : MonoBehaviour
             m_rigidBody.velocity = new Vector3(m_rigidBody.velocity.x, 0.0f, m_rigidBody.velocity.z);
             m_risingDone = true;
         }
-        else if (m_risingDone && !m_flingDone && m_buttonToWatch.Length != 0)
+        else if (m_risingDone && !m_flingDone /*&& m_buttonToWatch.Length != 0*/)
         {
             if (fire)
                 stabilize();
@@ -158,7 +170,13 @@ public class FlingableRock : MonoBehaviour
                 m_forceTotal += m_forward * m_forceForward * getDistanceRatio();
                 stabilize();
                 m_flingDone = true;
-                m_user = null;
+				//if (m_user.GetComponent<RockBulletAttack>() != null) m_user.GetComponent<RockBulletAttack>().DropBullet();
+				if (rockBulletAttack != null)
+					rockBulletAttack.DropBullet();
+				else {
+					Debug.Log("FUCK");
+				}
+				m_user = null;
             }
         }
 
@@ -219,9 +237,9 @@ public class FlingableRock : MonoBehaviour
         return false;
     }
 
-    public void fling(string _buttonToWatch, float _forceUp, float _forceForward, bool _heightReached)
+    public void fling(GameObject _user, float _forceUp, float _forceForward, bool _heightReached)
     {
-        m_buttonToWatch = _buttonToWatch;
+        m_user = _user;
         m_risingDone = _heightReached;
         m_risingStarted = _heightReached;
         m_flingDone = false;
@@ -332,6 +350,8 @@ public class FlingableRock : MonoBehaviour
         m_risingStarted = true;
         m_risingDone = true;
         m_flingDone = true;
+		if (m_user.GetComponent<RockBulletAttack>() != null) m_user.GetComponent<RockBulletAttack>().DropBullet();
+		else Debug.Log("FUCK");
         m_user = null;
     }
 
