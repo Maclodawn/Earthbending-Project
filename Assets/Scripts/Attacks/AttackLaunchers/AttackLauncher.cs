@@ -27,6 +27,8 @@ public abstract class AttackLauncher : MonoBehaviour {
 
 	protected abstract void updateInput();
 
+	public abstract Vector3 getTarget();
+
 	//the key is down since > 1 frame
 	public abstract bool isKey();
 	

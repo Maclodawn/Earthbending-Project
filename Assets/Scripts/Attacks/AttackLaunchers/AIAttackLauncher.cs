@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class AIAttackLauncher : AttackLauncher {
 
 	protected static float TIMER_MAX = 1f;
 	protected float timer = 1f;
 	protected bool key = false, keyUp = false, keyDown = false;
+	protected CompositeFrustum frustum = null;
 
 	// ---
 
@@ -64,6 +66,25 @@ public class AIAttackLauncher : AttackLauncher {
 	//the key has just been released
 	public override bool isKeyUp() {
 		return keyUp;
+	}
+
+	public override Vector3 getTarget() {
+		if (frustum == null) frustum = GetComponent<CompositeFrustum>();
+
+		List<GameObject> visibles = frustum.GetObjects();
+
+		Vector3 target;
+
+		//TODO AI computing here
+
+		if (visibles.Count > 0) {
+			target = (visibles[0].gameObject.transform.position - gameObject.transform.position).normalized;
+			transform.LookAt(transform.position + target);
+		} else {
+			target = transform.forward;
+		}
+
+		return target;
 	}
 
 	// ---
