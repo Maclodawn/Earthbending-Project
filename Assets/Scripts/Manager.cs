@@ -4,6 +4,22 @@ using System.Collections.Generic;
 
 public class Manager : MonoBehaviour
 {
+
+    private static Manager m_managerInstance = null;
+    public static Manager getManager()
+    {
+        if (m_managerInstance)
+            return m_managerInstance;
+
+        m_managerInstance = FindObjectOfType<Manager>();
+        return m_managerInstance;
+    }
+
+    public Terrain m_terrain;
+
+    public GameObject AIBody;
+    public int nAI;
+
     [SerializeField]
     GameObject m_originalPlayer;
 
@@ -33,6 +49,9 @@ public class Manager : MonoBehaviour
 
         GameObject player = Instantiate(m_originalPlayer);
         player.GetComponent<CharacterMovement>().init(this);
+
+		for (int i = 0; i < nAI; ++i)
+			Instantiate(AIBody);
 
         if(m_healthBar != null)
         {

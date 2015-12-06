@@ -30,7 +30,8 @@ public class BloodStain : MonoBehaviour {
 
     void Update()
     {
-        foreach(var stain in m_Shown)
+        LinkedList<UnityEngine.UI.Image> CpyShown = new LinkedList<UnityEngine.UI.Image>(m_Shown);
+        foreach (var stain in CpyShown)
         {
             var alpha = stain.color.a;
             alpha -= HideRate * Time.deltaTime;

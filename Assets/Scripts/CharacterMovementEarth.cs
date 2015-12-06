@@ -7,14 +7,14 @@ public class CharacterMovementEarth : CharacterMovement
     float m_timerAttack = 0.3f;
     float m_coolDownAttack = 0.3f;
     [SerializeField]
-    float m_rangeToTakeBullet = 5.0f;
+    float m_rangeToTakeBullet = 15.0f;
 
     Collider[] colliderList;
 
     [SerializeField]
-    float m_attack1ForceUp;
+    float m_attack1ForceUp = 32000;
     [SerializeField]
-    float m_attack1ForceForward;
+    float m_attack1ForceForward = 1000000;
 
     // Update is called once per frame
     protected override void Update()
@@ -87,7 +87,7 @@ public class CharacterMovementEarth : CharacterMovement
                 spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
             else
             {
-                //bullet.setUser(m_username);
+                bullet.setUser(gameObject);
                 bullet.fling("Fire1", m_attack1ForceUp, m_attack1ForceForward, false);
             }
         }
@@ -123,7 +123,14 @@ public class CharacterMovementEarth : CharacterMovement
         if (closerOne == -1)
             return null;
         else
-            return colliderList[closerOne].GetComponent<FlingableRock>();
+        {
+            FlingableRock flingableRock = colliderList[closerOne].GetComponent<FlingableRock>();
+
+            if (flingableRock.canRiseInMinTime(0.30f, this))
+                return flingableRock;
+
+            return null;
+        }
     }
 
     void spawnAndFlingBullet(string _buttonToWatch, float _forceUp, float _forceForward)
@@ -139,7 +146,7 @@ public class CharacterMovementEarth : CharacterMovement
             spawnProjectile = hit.point - new Vector3(0, meshRenderer.bounds.extents.y, 0);
 
             FlingableRock tmpBullet = ((GameObject)Instantiate(m_attack1Object, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
-            //tmpBullet.setUser(m_username);
+            tmpBullet.setUser(gameObject);
             tmpBullet.init(_buttonToWatch, _forceUp, _forceForward);
         }
     }
@@ -148,39 +155,51 @@ public class CharacterMovementEarth : CharacterMovement
     {
         Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
         RaycastHit hit = new RaycastHit();
-        if (!Physics.Raycast(ray, out hit, 5000))
-            hit.point = ray.direction * 5000;
+        bool collided = Physics.Raycast(ray, out hit, 5000);
 
-        Debug.DrawLine(ray.origin, hit.point, Color.white);
+        BreakableRock breakableRock = hit.collider.GetComponentInParent<BreakableRock>();
 
-        Vector3 direction = hit.point - transform.position;
-        direction.Normalize();
-
-        RaycastHit hitGround;
+        if (collided && breakableRock != null)
         {
-            Vector3 origin = transform.position + transform.forward * m_OffsetForwardEarth * 4;
-            if (!Physics.Raycast(origin, -Vector3.up, out hitGround, 50))
-                Physics.Raycast(origin, Vector3.up, out hitGround, 50);
+            breakableRock.breakRock(gameObject, "Fire2", m_attack1ForceUp, m_attack1ForceForward);
         }
+        else
+        {
+            if (!collided)
+                hit.point = ray.direction * 5000;
 
-        if (!hitGround.collider.gameObject.name.Contains("Terrain"))
-            return;
+            Vector3 direction = hit.point - transform.position;
+            direction.Normalize();
 
-        Quaternion rotation = Quaternion.FromToRotation(transform.up, hitGround.normal) * Quaternion.FromToRotation(m_attack2Object.transform.forward, transform.forward);
+            RaycastHit hitGround;
+            {
+                Vector3 origin = transform.position + transform.forward * m_OffsetForwardEarth * 4;
+                if (!Physics.Raycast(origin, -Vector3.up, out hitGround, 50))
+                    Physics.Raycast(origin, Vector3.up, out hitGround, 50);
+            }
 
-        Instantiate(m_attack2Object, hitGround.point, rotation);
+            if (!hitGround.collider.gameObject.name.Contains("Terrain"))
+                return;
+
+            Quaternion rotation = Quaternion.FromToRotation(transform.up, hitGround.normal) * Quaternion.FromToRotation(m_attack2Object.transform.forward, transform.forward);
+
+            Instantiate(m_attack2Object, hitGround.point, rotation);
+        }
     }
 
     protected override void basicAttack3()
     {
         Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
         RaycastHit hit;
+        bool collided = Physics.Raycast(ray, out hit, 5000);
+
+        BreakableRock breakableRock = hit.collider.GetComponentInParent<BreakableRock>();
+
         if (Physics.Raycast(ray, out hit, 5000))
         {
-            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("WallEarth"))
+            if (collided && breakableRock != null)
             {
-                BreakableRockWall breakableRockWall = hit.collider.gameObject.GetComponent<BreakableRockWall>();
-                breakableRockWall.breakRock(m_username, "Fire3", m_attack1ForceUp, 4000000);
+                breakableRock.breakRock(gameObject, "Fire2", m_attack1ForceUp, m_attack1ForceForward);
             }
             else
             {
@@ -199,5 +218,46 @@ public class CharacterMovementEarth : CharacterMovement
                 m_executingAtk3 = true;
             }
         }
+    }
+
+    protected override void basicAttack4()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
+        RaycastHit hit;
+        bool collided = Physics.Raycast(ray, out hit, 5000);
+
+        BreakableRock breakableRock = hit.collider.GetComponentInParent<BreakableRock>();
+        if (Physics.Raycast(ray, out hit, 5000))
+        {
+            if (collided && breakableRock != null)
+            {
+                breakableRock.breakRock(gameObject, "Fire2", m_attack1ForceUp, m_attack1ForceForward);
+            }
+            else
+            {
+                Quaternion rotation = Quaternion.FromToRotation(transform.up, hit.normal) * Quaternion.FromToRotation(m_attack4Object.transform.forward, transform.forward);
+                Vector3 newDirection = rotation * m_attack4Object.transform.up;
+
+                float ySize = 0;
+                for (int i = 0; i < m_attack4Object.transform.childCount; ++i)
+                {
+                    MeshRenderer meshRenderer = m_attack4Object.transform.GetChild(i).GetComponent<MeshRenderer>();
+                    ySize += meshRenderer.bounds.size.y;
+                }
+
+                Vector3 vect = newDirection * ySize / 2.0f;
+                Instantiate(m_attack4Object, hit.point - vect, rotation);
+                m_executingAtk4 = true;
+            }
+        }
+    }
+
+    public GameObject getCurrentGround()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, -Vector3.up, out hit, m_collider.bounds.extents.y + 0.1f))
+            return hit.collider.gameObject;
+        else
+            return null;
     }
 }

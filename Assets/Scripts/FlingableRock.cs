@@ -9,7 +9,6 @@ public class FlingableRock : MonoBehaviour
     float m_forceForward;
     float m_forceUp;
     public float m_forceStabilizer;
-    public float m_timeMinToRise;
 
     Vector3 m_gravityForce;
     Vector3 m_size;
@@ -34,7 +33,7 @@ public class FlingableRock : MonoBehaviour
     public GameObject m_smokeStartToMove;
     public GameObject m_smokeCollide;
 
-    public CharacterMovementEarth m_user { get; set; }
+    public GameObject m_user { get; set; }
 
     string m_buttonToWatch = "";
 
@@ -104,12 +103,14 @@ public class FlingableRock : MonoBehaviour
         // Update Underground
         {
             RaycastHit hit;
-            m_isUnderground = Physics.Raycast(transform.position, Vector3.up, out hit, 50)
+            m_isUnderground = Physics.Raycast(m_collider.bounds.center, Vector3.up, out hit, 50)
                               && hit.collider.gameObject.name.Contains("Terrain");
-            m_collider.enabled = !m_isUnderground;
 
             if (!m_isUnderground && m_wasUnderground)
+            {
                 Instantiate(m_smokeStartToMove, transform.position, Quaternion.identity);
+                Physics.IgnoreLayerCollision(gameObject.layer, Manager.getManager().m_terrain.gameObject.layer, false);
+            }
         }
 
         if (!m_risingStarted && !heightReached)
@@ -180,14 +181,49 @@ public class FlingableRock : MonoBehaviour
 
     bool isGrounded()
     {
-        return Physics.Raycast(transform.position, -Vector3.up, m_collider.bounds.extents.y + 0.1f);
+        return Physics.Raycast(m_collider.bounds.center, -Vector3.up, m_collider.bounds.extents.y + 0.1f);
+    }
+
+    bool isOnTheSameGroundOfTheUser()
+    {
+        RaycastHit hit;
+        if (m_user != null
+            && Physics.Raycast(m_collider.bounds.center, -Vector3.up, out hit, m_collider.bounds.extents.y + 0.1f))
+        {
+            string thisName = hit.collider.gameObject.name;
+			BasicMovement movement = m_user.GetComponent<BasicMovement>();
+			GameObject currentGround = movement.getCurrentGround();
+			if (currentGround == null) return false;
+            string thatName = currentGround.name;
+//             Debug.Log("thisName=" + thisName);
+//             Debug.Log("thatName=" + thatName);
+            return thisName.Contains(thatName);
+        }
+        return false;
+    }
+
+    bool isOnTheSameGroundOfTheUser(CharacterMovementEarth _user)
+    {
+        RaycastHit hit;
+        if (_user != null
+            && Physics.Raycast(m_collider.bounds.center, -Vector3.up, out hit, m_collider.bounds.extents.y + 0.1f))
+        {
+            string thisName = hit.collider.gameObject.name;
+			GameObject currentGround = _user.getCurrentGround();
+			if (currentGround == null) return false;
+            string thatName = currentGround.name;
+            //             Debug.Log("thisName=" + thisName);
+            //             Debug.Log("thatName=" + thatName);
+            return thisName.Contains(thatName);
+        }
+        return false;
     }
 
     public void fling(string _buttonToWatch, float _forceUp, float _forceForward, bool _heightReached)
     {
         m_buttonToWatch = _buttonToWatch;
-        m_risingDone = false;
-        m_risingStarted = false;
+        m_risingDone = _heightReached;
+        m_risingStarted = _heightReached;
         m_flingDone = false;
         m_forceUp = _forceUp;
         m_forceForward = _forceForward;
@@ -195,11 +231,19 @@ public class FlingableRock : MonoBehaviour
 
         updateSize();
 
-        if (_heightReached || (m_user != null && m_user.transform.position.y < transform.position.y) && !isGrounded())
+        if (_heightReached || /*m_user.transform.position.y < transform.position.y &&*/ !isOnTheSameGroundOfTheUser())
             m_heightToReach = transform.position.y;
         else
             m_heightToReach = transform.position.y + m_size.y;
     }
+
+	public void setUser(GameObject user) {
+		if (user == null) {
+			Debug.Log("OK");
+		}
+
+		m_user = user;
+	}
 
     /*public void setUser(string _playerID)
     {
@@ -207,7 +251,8 @@ public class FlingableRock : MonoBehaviour
 
 		foreach (GameObject go in gos)
         {
-			if (go.GetComponent<CharacterMovement>() != null && go.GetComponent<CharacterMovement>().m_username.Equals(_playerID)) {
+			if (go.GetComponent<CharacterMovement>() != null && go.GetComponent<CharacterMovement>().m_username.Equals(_playerID))
+            {
 				m_user = go.GetComponent<CharacterMovementEarth>();
 				break;
 			}
@@ -238,7 +283,7 @@ public class FlingableRock : MonoBehaviour
             }
         }
 
-        float volume = m_size.x * m_size.y * m_size.z;
+        float volume = MeshVolumeHelper.VolumeOfObject(gameObject);
         // 2700 is the average density of a rock Cf. http://www.les-mathematiques.net/phorum/read.php?2,49845
         m_rigidBody.mass = volume * 2700;
     }
@@ -265,14 +310,21 @@ public class FlingableRock : MonoBehaviour
 
     float getDistanceRatio()
     {
-		if(m_user == null)
-			Debug.Log("lol");
-		else
-		{
-			float ratio = m_user.m_OffsetForwardEarth / Vector3.Distance(transform.position, m_user.transform.position);
-			return Mathf.Min(2 * ratio, 1);
-		}
-		return 0;
+		if (m_user != null)
+        {
+            float ratio = m_user.GetComponent<EarthAttack>().m_OffsetForwardEarth / Vector3.Distance(transform.position, m_user.transform.position);
+            return Mathf.Min(4 * ratio, 1);
+        }
+        else
+        {
+            return 9999;
+        }
+    }
+
+    float getDistanceRatio(CharacterMovementEarth _user)
+    {
+        float ratio = _user.m_OffsetForwardEarth / Vector3.Distance(transform.position, _user.transform.position);
+        return Mathf.Min(4 * ratio, 1);
     }
 
     void setStateAvailable()
@@ -282,5 +334,29 @@ public class FlingableRock : MonoBehaviour
         m_risingDone = true;
         m_flingDone = true;
         m_user = null;
+    }
+
+    public bool canRiseInMinTime(float timeToRise, CharacterMovementEarth user)
+    {
+        if (!isOnTheSameGroundOfTheUser())
+            m_heightToReach = transform.position.y;
+        else
+            m_heightToReach = transform.position.y + m_size.y;
+
+        int nbFrameToDo = (int) (timeToRise / Time.deltaTime);
+        float timePerFrame = timeToRise / nbFrameToDo;
+        Vector3 force = m_gravityForce + Vector3.up * m_forceUp * getDistanceRatio(user);
+        Vector3 acceleration = force / m_rigidBody.mass;
+
+        float heightTraveled = 0;
+        float speed = 0;
+
+        for (int i = 0; i < nbFrameToDo; ++i)
+        {
+            speed += acceleration.y * timePerFrame;
+            heightTraveled += speed * timePerFrame;
+        }
+
+        return transform.position.y + heightTraveled >= m_heightToReach;
     }
 }
