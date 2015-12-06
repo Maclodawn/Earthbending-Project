@@ -6,6 +6,7 @@ public abstract class BasicMovement : MonoBehaviour {
 	protected CharacterController m_controller = null;
 	protected Vector2 input = Vector2.zero;
 	protected bool crouch = false, sprint = false, jump = false, dodge = false;
+	private AttackLauncher launcher;
 
 	// --- movement parameters
 
@@ -46,6 +47,9 @@ public abstract class BasicMovement : MonoBehaviour {
 	}
 
 	public void FixedUpdate() {
+		if (launcher == null) launcher = GetComponent<AttackLauncher>();
+		if (launcher.isAnyBusy()) return;
+
 		Vector3 direction = transform.forward * m_forwardSpeed + transform.right * m_rightSpeed;
 		direction.y = m_yVelocity;
 		m_controller.Move(direction * Time.deltaTime);

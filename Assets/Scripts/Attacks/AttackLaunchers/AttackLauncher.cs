@@ -38,7 +38,7 @@ public abstract class AttackLauncher : MonoBehaviour {
 	//the key has just been released
 	public abstract bool isKeyUp();
 
-	protected bool isAnyBusy() {
+	public bool isAnyBusy() {
 		foreach (BasicAttack a in atks) {
 			if (a.isBusy()) return true;
 		}
