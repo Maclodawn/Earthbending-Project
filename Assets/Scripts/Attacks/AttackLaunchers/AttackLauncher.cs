@@ -21,6 +21,10 @@ public abstract class AttackLauncher : MonoBehaviour {
 		}
 	}
 
+	public int getAtk() {
+		return atk;
+	}
+
 	protected abstract void updateInput();
 
 	//the key is down since > 1 frame

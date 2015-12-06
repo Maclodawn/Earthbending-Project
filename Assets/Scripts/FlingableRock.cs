@@ -34,8 +34,7 @@ public class FlingableRock : MonoBehaviour
     public GameObject m_smokeCollide;
 
     public GameObject m_user { get; set; }
-
-    string m_buttonToWatch = "";
+	private AttackLauncher m_launcher { get; set; }
 
     public bool m_alreadyInTheWorld = false;
 
@@ -62,9 +61,9 @@ public class FlingableRock : MonoBehaviour
     // Use this for initialization
     // init() method has been created instead of Start() method to be able to
     // initialize the bullet when it is used again by a character
-    virtual public void init(string _buttonToWatch, float _forceUp, float _forceForward)
+    virtual public void init(AttackLauncher _launcher, float _forceUp, float _forceForward)
     {
-        m_buttonToWatch = _buttonToWatch;
+		m_launcher = _launcher;
         m_risingStarted = false;
         m_risingDone = false;
         m_flingDone = false;
@@ -99,14 +98,7 @@ public class FlingableRock : MonoBehaviour
         }
 
         // For debugging
-        if (/*!fire &&*/ m_buttonToWatch.Length != 0) {
-			AI = false;
-            fire = Input.GetButton(m_buttonToWatch);
-		} else if (m_user != null) {
-			AI = true;
-			fire = m_user.GetComponent<AIAttackLauncher>().isKey();
-			//fire = m_user.GetComponent<AIAttackLauncher>().getAtk() == 0;
-		}
+		fire = m_launcher.isKey();
 
         m_forceTotal = m_gravityForce;
 
@@ -231,9 +223,9 @@ public class FlingableRock : MonoBehaviour
         return false;
     }
 
-    public void fling(string _buttonToWatch, float _forceUp, float _forceForward, bool _heightReached)
+    public void fling(AttackLauncher _launcher, float _forceUp, float _forceForward, bool _heightReached)
     {
-        m_buttonToWatch = _buttonToWatch;
+		m_launcher = _launcher;
         m_risingDone = _heightReached;
         m_risingStarted = _heightReached;
         m_flingDone = false;

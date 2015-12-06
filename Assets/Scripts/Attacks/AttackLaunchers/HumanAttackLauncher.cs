@@ -5,7 +5,7 @@ public class HumanAttackLauncher : AttackLauncher {
 
 	//the key is down since > 1 frame
 	public override bool isKey() {
-		return Input.GetButton("Fire");
+		return Input.GetButton("Fire1");
 	}
 	
 	//the key has just been pushed

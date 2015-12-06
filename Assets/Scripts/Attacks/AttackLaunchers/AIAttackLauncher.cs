@@ -66,10 +66,6 @@ public class AIAttackLauncher : AttackLauncher {
 		return keyUp;
 	}
 
-	public int getAtk() {
-		return atk;
-	}
-
 	// ---
 	
 	protected override void updateInput() {
