@@ -12,19 +12,6 @@ public class RockBulletAttack : EarthAttack {
 	
 	// ---
 
-	public void Update() {
-		if (timer < WAIT_TIME())
-			timer += Time.deltaTime;
-		
-		if (!icanexecute || isBusy())
-			return;
-		
-		updateMe();
-		
-		icanexecute = false;
-		timer = 0f;
-	}
-
 	protected override void updateMe() {
 		attack1();
 	}

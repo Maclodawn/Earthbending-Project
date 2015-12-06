@@ -52,17 +52,17 @@ public class AIAttackLauncher : AttackLauncher {
 	// ---
 
 	//the key is down since > 1 frame
-	public bool isKey() {
+	public override bool isKey() {
 		return key;
 	}
 
 	//the key has just been pushed
-	public bool isKeyDown() {
+	public override bool isKeyDown() {
 		return keyDown;
 	}
 
 	//the key has just been released
-	public bool isKeyUp() {
+	public override bool isKeyUp() {
 		return keyUp;
 	}
 
@@ -99,16 +99,6 @@ public class AIAttackLauncher : AttackLauncher {
 				timer += Time.deltaTime;
 		} else {
 			atk = tmp_atk;
-		}
-	}
-	
-	public void Update() {
-		updateInput();
-		
-		if (atk >= atks.Length || isAnyBusy()) return;
-		
-		if (keyDown) {
-			atks[atk].executeAttack();
 		}
 	}
 }

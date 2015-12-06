@@ -5,18 +5,32 @@ public abstract class AttackLauncher : MonoBehaviour {
 
 	protected BasicAttack[] atks;
 	protected int atk = -1;
-	protected bool hold;
 
 	// map here type of attacks to ids
 	public void Start() {
 		atks = GetComponent<AttacksGetter>().getOrderedAttacks();
 	}
 
+	public void Update() {
+		updateInput();
+		
+		if (atk >= atks.Length || isAnyBusy()) return;
+		
+		if ((atk == 0 && isKeyDown()) || atk > 0) {
+			atks[atk].executeAttack();
+		}
+	}
+
 	protected abstract void updateInput();
 
-	public bool BasicAtkOnHold() {
-		return atk == 0 && hold;
-	}
+	//the key is down since > 1 frame
+	public abstract bool isKey();
+	
+	//the key has just been pushed
+	public abstract bool isKeyDown();
+	
+	//the key has just been released
+	public abstract bool isKeyUp();
 
 	protected bool isAnyBusy() {
 		foreach (BasicAttack a in atks) {

@@ -6,6 +6,19 @@ public abstract class BasicAttack : MonoBehaviour {
 	protected bool icanexecute;
 	protected float timer = 0f;
 
+	public void Update() {
+		if (timer < WAIT_TIME())
+			timer += Time.deltaTime;
+		
+		if (!icanexecute || isBusy())
+			return;
+		
+		updateMe();
+		
+		icanexecute = false;
+		timer = 0f;
+	}
+
 	public void executeAttack() {
 		icanexecute = true;
 	}
