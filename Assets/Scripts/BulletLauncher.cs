@@ -3,7 +3,7 @@ using System.Collections;
 
 public class BulletLauncher : MonoBehaviour
 {
-    public GameObject m_attack1Object;
+    public GameObject m_attackObject;
 
     public string m_username = "";
 
@@ -42,13 +42,13 @@ public class BulletLauncher : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(spawnProjectile, -Vector3.up, out hit, 50))
         {
-            if (m_attack1Object.transform.childCount == 0)
+            if (m_attackObject.transform.childCount == 0)
                 return;
-            Transform child = m_attack1Object.transform.GetChild(0);
+            Transform child = m_attackObject.transform.GetChild(0);
             MeshRenderer meshRenderer = child.GetComponent<MeshRenderer>();
             spawnProjectile = hit.point - new Vector3(0, meshRenderer.bounds.extents.y, 0);
 
-            FlingableRock tmpBullet = ((GameObject)Instantiate(m_attack1Object, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
+            FlingableRock tmpBullet = ((GameObject)Instantiate(m_attackObject, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
             tmpBullet.setUser(m_username);
             tmpBullet.init(_buttonToWatch, _forceUp, _forceForward);
         }

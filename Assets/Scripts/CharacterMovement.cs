@@ -60,8 +60,6 @@ public class CharacterMovement : MonoBehaviour
         m_manager = _manager;
 
         m_controller = GetComponent<CharacterController>();
-        // FUCK YOU BITCH YOU DONT FUCKING WORK
-        //m_controller.detectCollisions = false;
 
         m_collider = GetComponent<Collider>();
 
@@ -73,6 +71,9 @@ public class CharacterMovement : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
+        //FIXME Debug
+        //basicAttack2();
+
         if (!GetComponentInChildren<InGameMenu>().m_isEscape)
         {
             if (!m_cursorLocked)
@@ -367,8 +368,13 @@ public class CharacterMovement : MonoBehaviour
         m_velocityHit = _velocity;
     }
 
-//     void OnControllerColliderHit(ControllerColliderHit hit)
-//     {
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (!hit.collider.gameObject.GetComponent<Terrain>())
+        {
+            int i = 0;
+            i++;
+        }
 //         if (!hit.collider.gameObject.GetComponent<Terrain>() && !m_onControllerColliderHitAlreadyCalled)
 //         {
 //             throw new System.Exception("OnControllerColliderHit call from CharacterController");
@@ -384,7 +390,7 @@ public class CharacterMovement : MonoBehaviour
 //             collidingObject.setVelocity(velocity1Final);
 //             setVelocity(velocity2Final);
 //         }
-//     }
+    }
 // 
 //     public void setOnControllerColliderHitAlreadyCalled()
 //     {

@@ -17,7 +17,7 @@ public class BreakableRockPillar : BreakableRock
         float opposite = hypothenus * Mathf.Sin(angle);
         Vector3 normal = Vector3.Cross(transform.forward, transform.right).normalized;
 
-        m_forwardOut = transform.forward + normal * opposite;
+        m_forwardOut = (transform.forward + normal * opposite);
 
         float y = m_size.y / 4 - m_baseSize.y;
         float x = m_size.x / 4;
@@ -38,9 +38,10 @@ public class BreakableRockPillar : BreakableRock
         RaycastHit hit;
         bool rayCast = Physics.Raycast(ray, out hit, 10);
 
-        if (rayCast && hit.transform.gameObject.name.Contains("Terrain"))
+        if (m_exitObstructed || rayCast && hit.transform.gameObject.name.Contains("Terrain"))
         {
-            m_rigidBody.constraints = RigidbodyConstraints.FreezeAll;
+            //m_rigidBody.constraints = RigidbodyConstraints.FreezeAll;
+            m_rigidBody.isKinematic = true;
             m_notFrozen = false;
         }
     }
@@ -49,5 +50,16 @@ public class BreakableRockPillar : BreakableRock
     {
         //FIXME : Besoin d'avoir des mesh dont le scale est à 1 même si leur taille ne fait pas 1
         _gameObject.transform.localScale = transform.localScale;
+    }
+
+    public override void setVelocity(Vector3 _velocity)
+    {
+        if (_velocity.x < 0 || _velocity.y < 0 || _velocity.z < 0)
+        {
+            m_rigidBody.velocity = Vector3.zero;
+            m_exitObstructed = true;
+        }
+        else
+            m_rigidBody.velocity = _velocity;
     }
 }

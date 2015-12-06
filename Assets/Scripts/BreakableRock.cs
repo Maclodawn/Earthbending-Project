@@ -6,6 +6,7 @@ public class BreakableRock : MonoBehaviour
 {
     bool m_isSpawning = true;
     protected bool m_notFrozen = true;
+    protected bool m_exitObstructed = false;
     [SerializeField]
     float m_timeToGoOut;
     protected Vector3 m_forwardOut;
@@ -109,5 +110,49 @@ public class BreakableRock : MonoBehaviour
     protected virtual void scaleIt(GameObject _gameObject)
     {
         // Do nothing
+    }
+
+    public virtual void setVelocity(Vector3 _velocity)
+    {
+        m_rigidBody.velocity = _velocity;
+    }
+
+    public Vector3 getVelocity()
+    {
+        return m_rigidBody.velocity;
+    }
+
+    public float getMass()
+    {
+        return m_rigidBody.mass;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (!collision.gameObject.GetComponent<Terrain>())
+        {
+            if (!collision.gameObject.GetComponent<Rigidbody>())
+            {
+                CharacterMovement collidingObject = collision.gameObject.GetComponent<CharacterMovement>();
+                Vector3 vect = getVelocity() - collidingObject.getVelocity();
+
+                Vector3 velocity1Final = (collidingObject.m_mass / (getMass() + collidingObject.m_mass)) * vect;
+                velocity1Final = velocity1Final.magnitude * collision.contacts[0].normal;
+
+                Vector3 velocity2Final = (-getMass() / (getMass() + collidingObject.m_mass)) * vect;
+                velocity2Final = velocity2Final.magnitude * -collision.contacts[0].normal;
+
+//                 Debug.DrawRay(collidingObject.transform.position, collidingObject.getVelocity(), Color.blue);
+//                 Debug.DrawRay(transform.position, getVelocity(), Color.green);
+//                 Debug.DrawRay(collidingObject.transform.position, velocity2Final, Color.cyan);
+//                 Debug.DrawRay(transform.position, velocity1Final, Color.red);
+//                 UnityEditor.EditorApplication.isPaused = true;
+
+                setVelocity(velocity1Final);
+                collidingObject.setVelocity(velocity2Final);
+                // 
+                //                     collidingObject.setOnControllerColliderHitAlreadyCalled();
+            }
+        }
     }
 }
