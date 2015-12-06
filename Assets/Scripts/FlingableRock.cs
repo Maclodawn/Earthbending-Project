@@ -322,14 +322,15 @@ public class FlingableRock : MonoBehaviour
 
     float getDistanceRatio()
     {
-		if (m_user == null)
-		{
-			int i = 0;
-			++i;
-		}
-
-        float ratio = m_user.GetComponent<EarthAttack>().m_OffsetForwardEarth / Vector3.Distance(transform.position, m_user.transform.position);
-        return Mathf.Min(4 * ratio, 1);
+		if (m_user != null)
+        {
+            float ratio = m_user.GetComponent<EarthAttack>().m_OffsetForwardEarth / Vector3.Distance(transform.position, m_user.transform.position);
+            return Mathf.Min(4 * ratio, 1);
+        }
+        else
+        {
+            return 9999;
+        }
     }
 
     float getDistanceRatio(CharacterMovementEarth _user)

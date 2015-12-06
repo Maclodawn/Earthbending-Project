@@ -3,6 +3,8 @@ using System.Collections;
 
 public class CharacterMovement : MonoBehaviour
 {
+    protected bool m_pause;
+
     protected Manager m_manager;
     protected CharacterController m_controller;
 
@@ -44,6 +46,9 @@ public class CharacterMovement : MonoBehaviour
 
     protected Collider m_collider;
 
+
+    public string m_username = "";
+
     // Use this for initialization
     public void init(Manager _manager)
     {
@@ -61,20 +66,8 @@ public class CharacterMovement : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
-        if (!GetComponentInChildren<InGameMenu>().m_isEscape)
-        {
-            if (!m_cursorLocked)
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-                m_cursorLocked = true;
-            }
-        }
-        else if (m_cursorLocked)
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
+        if (m_pause)
+            return;
 
         // -------------------------------------Attack----------------------------------------------
         attack();
@@ -234,6 +227,9 @@ public class CharacterMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (m_pause)
+            return;
+
         // --------------------------------------------Move --------------------------------------------------
         Vector3 direction = transform.forward * m_forwardSpeed + transform.right * m_rightSpeed;
         direction.y = m_yVelocity;
@@ -298,5 +294,17 @@ public class CharacterMovement : MonoBehaviour
         }
         else
             m_cooldownBeforeDodgeTimer += Time.deltaTime;
+    }
+
+    public void ReceiveMessage(object msg)
+    {
+        string str = msg as string;
+        if(str != null)
+        {
+            if (str == "Pause")
+                m_pause = true;
+            else if (str == "UnPause")
+                m_pause = false;
+        }
     }
 }

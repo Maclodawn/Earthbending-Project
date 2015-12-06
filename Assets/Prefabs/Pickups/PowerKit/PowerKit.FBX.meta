@@ -1,7 +1,7 @@
 fileFormatVersion: 2
-guid: 44aa2f4ffcf123c4f8e33686fb7b9a87
-timeCreated: 1446621681
-licenseType: Pro
+guid: c2632940a3f02e74b9bee78fc3bb940a
+timeCreated: 1449287501
+licenseType: Free
 ModelImporter:
   serializedVersion: 18
   fileIDToRecycleName:
@@ -9,8 +9,7 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: Box002
-    9500000: //RootNode
+    4300000: Sphere001
   materials:
     importMaterials: 1
     materialName: 0
@@ -69,7 +68,7 @@ ModelImporter:
     rootMotionBoneName: 
     hasTranslationDoF: 0
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 0
   humanoidOversampling: 1
   additionalBone: 0
   userData: 

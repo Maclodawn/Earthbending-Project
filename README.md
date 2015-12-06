@@ -8,7 +8,7 @@ A game in which players can fight using the environment based on the elements.
 Gabriel Rassoul - Belkacem Lahouel - Benoît Kessabian - Donatien Rabiller  
   
 ## HOW DOES IT WORK?  
-- Unity3D 5.2.0f3  
+- Unity3D 5.2.1f1 (5.2.0f3)  
 - C#  
   
 We mainly use those technologies.  
