@@ -9,7 +9,8 @@ public class BreakableRockPillar : BreakableRock
     {
         base.Start();
 
-        Physics.IgnoreCollision(m_boxCollider, Manager.getManager().m_terrain.GetComponent<Collider>());
+		Collider terrainCollider = Manager.getManager().m_terrain.GetComponent<Collider>();
+        Physics.IgnoreCollision(m_boxCollider, terrainCollider);
 
         float angle = m_boxCollider.transform.eulerAngles.z * Mathf.PI / 180;
         float adjacent = transform.forward.magnitude;

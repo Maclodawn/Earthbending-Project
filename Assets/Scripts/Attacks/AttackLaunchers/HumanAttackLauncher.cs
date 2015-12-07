@@ -40,6 +40,10 @@ public class HumanAttackLauncher : AttackLauncher {
 	}
 
 	protected override void updateInput() {
+		//cf AttacksGetter (e.g. EarthAttacksGetter) for the input order
+
+		if (atk > 0) atk = -1;
+
 		if (Input.GetButtonDown("Fire1")) {
 			atk = 0;
 		}
