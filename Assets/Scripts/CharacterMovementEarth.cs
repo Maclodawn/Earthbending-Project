@@ -11,7 +11,7 @@ public class CharacterMovementEarth : CharacterMovement
 
     Collider[] colliderList;
 
-	AttackLauncher m_launcher;
+	AttackLauncher m_launcher = null;
 
     [SerializeField]
     float m_attack1ForceUp = 32000;
@@ -133,8 +133,8 @@ public class CharacterMovementEarth : CharacterMovement
             return null;
         else
         {
-            FlingableRock flingableRock = colliderList[closerOne].GetComponent<FlingableRock>();
-
+//             FlingableRock flingableRock = colliderList[closerOne].GetComponent<FlingableRock>();
+//
 //             if (flingableRock.canRiseInMinTime(0.30f, this))
 //                 return flingableRock;
 

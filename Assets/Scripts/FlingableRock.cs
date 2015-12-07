@@ -166,9 +166,7 @@ public class FlingableRock : MonoBehaviour
 
     virtual protected void FixedUpdate()
     {
-		bool AI = false;
-
-        // Cheat
+		// Cheat
         if (Input.GetKeyDown(KeyCode.A))
         {
             Destroy(this.gameObject);

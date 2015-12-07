@@ -4,8 +4,8 @@ using System.Collections;
 public class HumanMovement : BasicMovement {
 
 	protected override void updateInput() {
-		input.x = Input.GetAxis("Horizontal");
-		input.y = Input.GetAxis("Vertical");
+        input.x = Input.GetAxisRaw("Horizontal");
+		input.y = Input.GetAxisRaw("Vertical");
 
 		sprint = Input.GetButton("Sprint");
 		crouch = Input.GetButton("Crouch");
