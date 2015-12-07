@@ -11,6 +11,7 @@ public class GameController : MonoBehaviour {
         SHOW_MENU,
         SHOW_OPTION_MENU,
         SHOW_START_MENU,
+        SHOW_CREDITS,
     }
 
     private State CurrentState;
@@ -35,6 +36,7 @@ public class GameController : MonoBehaviour {
     public GameObject MainMenu;
     public GameObject StartSubMenu;
     public GameObject OptionSubMenu;
+    public GameObject CreditsSubMenu;
 
     [Header("Misc")]
     public UnityEngine.UI.InputField MapName;
@@ -221,6 +223,13 @@ public class GameController : MonoBehaviour {
             OptionSubMenu.SetActive(true);
         }
 
+        if(command == "ShowCredits")
+        {
+            SwitchState(State.SHOW_CREDITS);
+            MainMenu.SetActive(false);
+            CreditsSubMenu.SetActive(true);
+        }
+
         if (command == "Back")
         {
             OnBackClicked();
@@ -242,6 +251,11 @@ public class GameController : MonoBehaviour {
                 break;
             case State.SHOW_START_MENU:
                 StartSubMenu.SetActive(false);
+                MainMenu.SetActive(true);
+                break;
+
+            case State.SHOW_CREDITS:
+                CreditsSubMenu.SetActive(false);
                 MainMenu.SetActive(true);
                 break;
 
