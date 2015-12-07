@@ -125,6 +125,7 @@ public class BreakableRock : MonoBehaviour
 
         Object obj = Instantiate(m_pieceList[0], child.position + Vector3.up * 0.1f, child.rotation);
         m_pieceList.RemoveAt(0);
+
         GameObject gameObject = (GameObject)obj;
         scaleIt(gameObject);
         FlingableRock flingableRock = gameObject.GetComponent<FlingableRock>();

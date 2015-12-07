@@ -311,12 +311,18 @@ public class FlingableRock : MonoBehaviour
         m_forceForward = _forceForward;
         Instantiate(m_smokeStartToMove, transform.position, Quaternion.identity);
 
-        updateSize();
+        //updateSize();
 
         if (_heightReached || /*m_user.transform.position.y < transform.position.y &&*/ !isOnTheSameGroundOfTheUser())
             m_heightToReach = transform.position.y;
         else
             m_heightToReach = transform.position.y + m_size.y;
+
+        if (m_previousPos.Count < 0)
+        {
+            m_previousPos.Add(transform.position);
+            m_previousPos.Add(transform.position);
+        }
     }
 
 	public void setUser(GameObject user) {
@@ -370,7 +376,15 @@ public class FlingableRock : MonoBehaviour
             }
         }
 
-        float volume = MeshVolumeHelper.VolumeOfObject(gameObject);
+        float volume = 0;
+        if (GetComponent<SphereCollider>())
+        {
+            volume = Mathf.PI * Mathf.Pow(GetComponent<SphereCollider>().radius, 3) * 4 / 3;
+        }
+        else
+        {
+            MeshVolumeHelper.VolumeOfObject(gameObject);
+        }
         m_rigidBody.mass = volume * m_density;
     }
 
