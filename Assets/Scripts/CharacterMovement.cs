@@ -7,7 +7,7 @@ public class CharacterMovement : MonoBehaviour
 
     protected Manager m_manager;
     protected CharacterController m_controller;
-	protected Animator m_Animator;
+    protected Animator m_Animator;
 
     protected float m_currentMoveSpeed = 1.0f;
     public float m_runSpeed = 7.0f;
@@ -43,7 +43,7 @@ public class CharacterMovement : MonoBehaviour
     public GameObject m_attack2Object;
     public GameObject m_attack3Object;
     public GameObject m_attack4Object;
-	
+
     private bool m_cursorLocked;
 
     protected Collider m_collider;
@@ -53,7 +53,7 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField]
     float m_speedFrictionHit;
 
-//    bool m_onControllerColliderHitAlreadyCalled = false;
+    //    bool m_onControllerColliderHitAlreadyCalled = false;
 
     // Use this for initialization
     public void init(Manager _manager)
@@ -62,7 +62,7 @@ public class CharacterMovement : MonoBehaviour
 
         m_controller = GetComponent<CharacterController>();
 
-		m_Animator = GetComponent<Animator> ();
+        m_Animator = GetComponent<Animator>();
 
         m_collider = GetComponent<Collider>();
 
@@ -220,16 +220,21 @@ public class CharacterMovement : MonoBehaviour
         // ------------------------------------------- End Movement -----------------------------------------
 
         // --------------------------------------------Jump --------------------------------------------------
-        if (m_controller.isGrounded) {
-			if (Input.GetButtonDown ("Jump") && !m_dodging) {
-				m_yVelocity = m_jumpSpeed;
-				m_Animator.Play("Jump");
-				m_Animator.CrossFade("Grounded", 1f);
-			} else if (Input.GetButtonDown ("Jump") && m_dodging)
-				m_yVelocity = 0;
-		} else {
-			m_yVelocity -= m_gravity;
-		}
+        if (m_controller.isGrounded)
+        {
+            if (Input.GetButtonDown("Jump") && !m_dodging)
+            {
+                m_yVelocity = m_jumpSpeed;
+                m_Animator.Play("Jump");
+                m_Animator.CrossFade("Grounded", 1f);
+            }
+            else if (Input.GetButtonDown("Jump") && m_dodging)
+                m_yVelocity = 0;
+        }
+        else
+        {
+            m_yVelocity -= m_gravity;
+        }
 
         if (m_dodging)
         {
@@ -244,40 +249,39 @@ public class CharacterMovement : MonoBehaviour
     }
 
     void FixedUpdate()
-	{
-		if (m_pause)
-			return;
+    {
+        if (m_pause)
+            return;
 
-		// --------------------------------------------Move --------------------------------------------------
-		Vector3 direction = transform.forward * m_forwardSpeed + transform.right * m_rightSpeed;
-		direction.y = m_yVelocity;
-		if (direction.z == 0 && direction.x == 0) {
-			m_Animator.SetBool ("Idle", true);
-		} else {
-			m_Animator.SetBool ("Idle", false);
-		}
-
-		Vector3 newDir = transform.InverseTransformDirection (direction);
-		m_Animator.SetFloat ("Forward", newDir.z, 0.1f, Time.deltaTime);
-		m_Animator.SetFloat ("Turn", Mathf.Atan2 (newDir.x, newDir.z), 0.1f, Time.deltaTime);
-		m_Animator.SetFloat ("Jump", m_yVelocity);
-
-		float runCycle = Mathf.Repeat(m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime + 0.2f, 1);
-		float jumpLeg = (runCycle < 0.5f ? 1 : -1) * newDir.z;
-		if (m_controller.isGrounded)
-		{
-			m_Animator.SetFloat("JumpLeg", jumpLeg);
-		}
-
-		if (m_controller.isGrounded && direction.magnitude > 0) {
-			m_Animator.speed = 1f;
-		}
-
-//        m_onControllerColliderHitAlreadyCalled = false;
         // --------------------------------------------Move --------------------------------------------------
         Vector3 direction = transform.forward * m_forwardSpeed + transform.right * m_rightSpeed;
         direction.y = m_yVelocity;
-        //[ANIM]
+        if (direction.z == 0 && direction.x == 0)
+        {
+            m_Animator.SetBool("Idle", true);
+        }
+        else
+        {
+            m_Animator.SetBool("Idle", false);
+        }
+
+        Vector3 newDir = transform.InverseTransformDirection(direction);
+        m_Animator.SetFloat("Forward", newDir.z, 0.1f, Time.deltaTime);
+        m_Animator.SetFloat("Turn", Mathf.Atan2(newDir.x, newDir.z), 0.1f, Time.deltaTime);
+        m_Animator.SetFloat("Jump", m_yVelocity);
+
+        float runCycle = Mathf.Repeat(m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime + 0.2f, 1);
+        float jumpLeg = (runCycle < 0.5f ? 1 : -1) * newDir.z;
+        if (m_controller.isGrounded)
+        {
+            m_Animator.SetFloat("JumpLeg", jumpLeg);
+        }
+
+        if (m_controller.isGrounded && direction.magnitude > 0)
+        {
+            m_Animator.speed = 1f;
+        }
+
         m_controller.Move(direction * Time.deltaTime);
         m_Animator.SetBool("OnGround", true);
         // --------------------------------------------End move --------------------------------------------------
@@ -297,7 +301,7 @@ public class CharacterMovement : MonoBehaviour
             m_yVelocity -= m_gravity;
 
         speed += Vector3.up * m_yVelocity;
-        
+
         if (m_controller.isGrounded && m_speedFrictionHit != 0)
         {
             Vector3 friction = -speed.normalized * m_speedFrictionHit;
@@ -337,16 +341,16 @@ public class CharacterMovement : MonoBehaviour
     }
 
     protected virtual void basicAttack1()
-    { 
-	}
+    {
+    }
 
     protected virtual void basicAttack2()
-    { 
-	}
+    {
+    }
 
     protected virtual void basicAttack3()
     {
-	}
+    }
 
     protected virtual void basicAttack4()
     { }
@@ -382,7 +386,7 @@ public class CharacterMovement : MonoBehaviour
     public void ReceiveMessage(object msg)
     {
         string str = msg as string;
-        if(str != null)
+        if (str != null)
         {
             if (str == "Pause")
                 m_pause = true;
@@ -410,25 +414,25 @@ public class CharacterMovement : MonoBehaviour
             int i = 0;
             i++;
         }
-//         if (!hit.collider.gameObject.GetComponent<Terrain>() && !m_onControllerColliderHitAlreadyCalled)
-//         {
-//             throw new System.Exception("OnControllerColliderHit call from CharacterController");
-//             FlingableRock collidingObject = hit.collider.gameObject.GetComponent<FlingableRock>();
-//             Vector3 vect = collidingObject.getVelocity() - getVelocity();
-// 
-//             Vector3 velocity1Final = (m_mass / (collidingObject.getMass() + m_mass)) * vect;
-//             velocity1Final = velocity1Final.magnitude * hit.normal;
-// 
-//             Vector3 velocity2Final = (-collidingObject.getMass() / (collidingObject.getMass() + m_mass)) * vect;
-//             velocity2Final = velocity2Final.magnitude * -hit.normal;
-// 
-//             collidingObject.setVelocity(velocity1Final);
-//             setVelocity(velocity2Final);
-//         }
+        //         if (!hit.collider.gameObject.GetComponent<Terrain>() && !m_onControllerColliderHitAlreadyCalled)
+        //         {
+        //             throw new System.Exception("OnControllerColliderHit call from CharacterController");
+        //             FlingableRock collidingObject = hit.collider.gameObject.GetComponent<FlingableRock>();
+        //             Vector3 vect = collidingObject.getVelocity() - getVelocity();
+        // 
+        //             Vector3 velocity1Final = (m_mass / (collidingObject.getMass() + m_mass)) * vect;
+        //             velocity1Final = velocity1Final.magnitude * hit.normal;
+        // 
+        //             Vector3 velocity2Final = (-collidingObject.getMass() / (collidingObject.getMass() + m_mass)) * vect;
+        //             velocity2Final = velocity2Final.magnitude * -hit.normal;
+        // 
+        //             collidingObject.setVelocity(velocity1Final);
+        //             setVelocity(velocity2Final);
+        //         }
     }
-// 
-//     public void setOnControllerColliderHitAlreadyCalled()
-//     {
-//         m_onControllerColliderHitAlreadyCalled = true;
-//     }
+    // 
+    //     public void setOnControllerColliderHitAlreadyCalled()
+    //     {
+    //         m_onControllerColliderHitAlreadyCalled = true;
+    //     }
 }

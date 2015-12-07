@@ -62,5 +62,7 @@ public class BreakableRockPillarAttack : EarthAttack {
         Quaternion rotation = xAndzRotation * yRotation;
 
         Instantiate(rockPillar, hitGround.point, rotation);
+        GetComponent<BasicMovement>().m_Animator.Play("Attack 02");
+        GetComponent<BasicMovement>().m_Animator.CrossFade("Grounded", 1f);
     }
 }

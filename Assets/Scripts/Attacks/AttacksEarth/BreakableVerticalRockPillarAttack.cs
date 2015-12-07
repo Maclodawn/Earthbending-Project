@@ -53,5 +53,7 @@ public class BreakableVerticalRockPillarAttack : EarthAttack {
         Vector3 vect = newDirection * ySize / 2.0f;
         Instantiate(verticalRockPillar, hit.point - vect, rotation);
         //m_executingAtk3 = true;
+        GetComponent<BasicMovement>().m_Animator.Play("Attack 03");
+        GetComponent<BasicMovement>().m_Animator.CrossFade("Grounded", 1f);
     }
 }

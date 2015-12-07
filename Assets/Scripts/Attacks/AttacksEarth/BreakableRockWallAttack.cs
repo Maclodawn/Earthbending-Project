@@ -34,5 +34,7 @@ public class BreakableRockWallAttack : EarthAttack {
 
         Vector3 vect = newDirection * ySize / 2.0f;
         Instantiate(rockWall, hit.point - vect, rotation);
+        GetComponent<BasicMovement>().m_Animator.Play("Attack 03");
+        GetComponent<BasicMovement>().m_Animator.CrossFade("Grounded", 1f);
     }
 }

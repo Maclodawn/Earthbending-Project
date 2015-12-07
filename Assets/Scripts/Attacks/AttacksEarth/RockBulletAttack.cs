@@ -71,6 +71,8 @@ public class RockBulletAttack : EarthAttack {
                     spawnAndFlingBullet(GetComponent<AttackLauncher>(), m_attack1ForceUp, m_attack1ForceForward);
             }
         }
+        GetComponent<BasicMovement>().m_Animator.Play("Attack 01");
+        GetComponent<BasicMovement>().m_Animator.CrossFade("Grounded", 1f);
 	}
 
 	// ---
