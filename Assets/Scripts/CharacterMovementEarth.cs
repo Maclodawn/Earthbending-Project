@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class CharacterMovementEarth : CharacterMovement
@@ -28,6 +28,7 @@ public class CharacterMovementEarth : CharacterMovement
     protected override void attack()
     {
         base.attack();
+
 
         if (m_executingAtk1)
         {
@@ -77,7 +78,8 @@ public class CharacterMovementEarth : CharacterMovement
 
     protected override void basicAttack1()
     {
-        colliderList = Physics.OverlapSphere(transform.position, m_rangeToTakeBullet);
+
+		colliderList = Physics.OverlapSphere(transform.position, m_rangeToTakeBullet);
         FlingableRock bullet = null;
 
         if (colliderList.Length > 0)
@@ -95,6 +97,8 @@ public class CharacterMovementEarth : CharacterMovement
             spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
 
         m_executingAtk1 = true;
+		m_Animator.Play ("Attack 01");
+		m_Animator.CrossFade ("Grounded", 1f);
     }
 
     FlingableRock findBullet()
@@ -169,6 +173,8 @@ public class CharacterMovementEarth : CharacterMovement
         Quaternion rotation = Quaternion.FromToRotation(transform.up, hitGround.normal) * Quaternion.FromToRotation(m_attack2Object.transform.forward, transform.forward);
 
         Instantiate(m_attack2Object, hitGround.point, rotation);
+		m_Animator.Play ("Attack 02");
+		m_Animator.CrossFade ("Grounded", 1f);
     }
 
     protected override void basicAttack3()
@@ -199,5 +205,7 @@ public class CharacterMovementEarth : CharacterMovement
                 m_executingAtk3 = true;
             }
         }
+		m_Animator.Play ("Attack 03");
+		m_Animator.CrossFade ("Grounded", 1f);
     }
 }

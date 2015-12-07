@@ -7,6 +7,7 @@ public class CharacterMovement : MonoBehaviour
 
     protected Manager m_manager;
     protected CharacterController m_controller;
+	protected Animator m_Animator;
 
     protected float m_currentMoveSpeed = 1.0f;
     public float m_runSpeed = 7.0f;
@@ -48,6 +49,8 @@ public class CharacterMovement : MonoBehaviour
         m_manager = _manager;
 
         m_controller = GetComponent<CharacterController>();
+
+		m_Animator = GetComponent<Animator> ();
 
         m_currentMoveSpeed = m_runSpeed;
 
@@ -195,15 +198,16 @@ public class CharacterMovement : MonoBehaviour
         // ------------------------------------------- End Movement -----------------------------------------
 
         // --------------------------------------------Jump --------------------------------------------------
-        if (m_controller.isGrounded)
-        {
-            if (Input.GetButtonDown("Jump") && !m_dodging)
-                m_yVelocity = m_jumpSpeed;
-            else if (Input.GetButtonDown("Jump") && m_dodging)
-                m_yVelocity = 0;
-        }
-        else
-            m_yVelocity -= m_gravity;
+        if (m_controller.isGrounded) {
+			if (Input.GetButtonDown ("Jump") && !m_dodging) {
+				m_yVelocity = m_jumpSpeed;
+				m_Animator.Play("Jump");
+				m_Animator.CrossFade("Grounded", 1f);
+			} else if (Input.GetButtonDown ("Jump") && m_dodging)
+				m_yVelocity = 0;
+		} else {
+			m_yVelocity -= m_gravity;
+		}
 
         if (m_dodging)
         {
@@ -213,41 +217,71 @@ public class CharacterMovement : MonoBehaviour
 
         if (!m_ableToDodge)
             cdBeforeDodge();
+
         // --------------------------------------------End Jump --------------------------------------------------
     }
 
     void FixedUpdate()
-    {
-        if (m_pause)
-            return;
+	{
+		if (m_pause)
+			return;
 
-        // --------------------------------------------Move --------------------------------------------------
-        Vector3 direction = transform.forward * m_forwardSpeed + transform.right * m_rightSpeed;
-        direction.y = m_yVelocity;
+		// --------------------------------------------Move --------------------------------------------------
+		Vector3 direction = transform.forward * m_forwardSpeed + transform.right * m_rightSpeed;
+		direction.y = m_yVelocity;
+		if (direction.z == 0 && direction.x == 0) {
+			m_Animator.SetBool ("Idle", true);
+		} else {
+			m_Animator.SetBool ("Idle", false);
+		}
+
+		Vector3 newDir = transform.InverseTransformDirection (direction);
+		m_Animator.SetFloat ("Forward", newDir.z, 0.1f, Time.deltaTime);
+		m_Animator.SetFloat ("Turn", Mathf.Atan2 (newDir.x, newDir.z), 0.1f, Time.deltaTime);
+		m_Animator.SetFloat ("Jump", m_yVelocity);
+
+		float runCycle = Mathf.Repeat(m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime + 0.2f, 1);
+		float jumpLeg = (runCycle < 0.5f ? 1 : -1) * newDir.z;
+		if (m_controller.isGrounded)
+		{
+			m_Animator.SetFloat("JumpLeg", jumpLeg);
+		}
+
+		if (m_controller.isGrounded && direction.magnitude > 0) {
+			m_Animator.speed = 1f;
+		}
+
         m_controller.Move(direction * Time.deltaTime);
+		m_Animator.SetBool("OnGround", true);
         // --------------------------------------------End move --------------------------------------------------
     }
 
     protected virtual void attack()
     {
-        if (Input.GetButtonDown("Fire1") && m_controller.isGrounded && !m_dodging)
-            basicAttack1();
+        if (Input.GetButtonDown ("Fire1") && m_controller.isGrounded && !m_dodging) {
+			basicAttack1 ();
+		}
 
-        if (Input.GetButtonDown("Fire2") && m_controller.isGrounded && !m_dodging)
-            basicAttack2();
+        if (Input.GetButtonDown ("Fire2") && m_controller.isGrounded && !m_dodging) {
+			basicAttack2 ();
+		}
 
-        if (Input.GetButtonDown("Fire3") && m_controller.isGrounded && !m_dodging)
-            basicAttack3();
+        if (Input.GetButtonDown ("Fire3") && m_controller.isGrounded && !m_dodging) {
+			basicAttack3 ();
+		}
     }
 
     protected virtual void basicAttack1()
-    { }
+    { 
+	}
 
     protected virtual void basicAttack2()
-    { }
+    { 
+	}
 
     protected virtual void basicAttack3()
-    { }
+    {
+	}
 
     void dodge()
     {

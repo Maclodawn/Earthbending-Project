@@ -265,9 +265,7 @@ public class FlingableRock : MonoBehaviour
 
     float getDistanceRatio()
     {
-		if(m_user == null)
-			Debug.Log("lol");
-		else
+		if(m_user)
 		{
 			float ratio = m_user.m_OffsetForwardEarth / Vector3.Distance(transform.position, m_user.transform.position);
 			return Mathf.Min(2 * ratio, 1);
