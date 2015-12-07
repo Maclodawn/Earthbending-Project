@@ -74,6 +74,10 @@ public class FlingableRock : MonoBehaviour
     virtual public void init(AttackLauncher _launcher, float _forceUp, float _forceForward)
     {
 		m_launcher = _launcher;
+
+//         if (_buttonToWatch.Contains("Cheat"))
+//             fireCheat = true;
+//         m_buttonToWatch = _buttonToWatch;
         m_risingStarted = false;
         m_risingDone = false;
         m_flingDone = false;
@@ -99,7 +103,7 @@ public class FlingableRock : MonoBehaviour
             Ray ray = new Ray(m_previousPos[1], transform.position - m_previousPos[1]);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit))
-    {
+            {
                 //Debug.DrawLine(ray.origin, hit.point, Color.yellow);
 //                 GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 //                 go.transform.localScale /= 5;
@@ -126,29 +130,29 @@ public class FlingableRock : MonoBehaviour
 
                 
                 if (!collision.gameObject.GetComponent<Rigidbody>())
-    {
-					//FIXME: CharacterMovement -> BasicMovement
+                {
                     CharacterMovement collidingObject = collision.gameObject.GetComponent<CharacterMovement>();
-					if (collidingObject) {
-	                    Vector3 vect = getVelocity() - collidingObject.getVelocity();
+                    if (collidingObject)
+                    {
+                        Vector3 vect = getVelocity() - collidingObject.getVelocity();
 
-	                    Vector3 velocity1Final = (collidingObject.m_mass / (getMass() + collidingObject.m_mass)) * vect;
-	                    velocity1Final = velocity1Final.magnitude * collision.contacts[0].normal;
+                        Vector3 velocity1Final = (collidingObject.m_mass / (getMass() + collidingObject.m_mass)) * vect;
+                        velocity1Final = velocity1Final.magnitude * collision.contacts[0].normal;
 
-	                    Vector3 velocity2Final = (-getMass() / (getMass() + collidingObject.m_mass)) * vect;
-	                    velocity2Final = velocity2Final.magnitude * -collision.contacts[0].normal;
+                        Vector3 velocity2Final = (-getMass() / (getMass() + collidingObject.m_mass)) * vect;
+                        velocity2Final = velocity2Final.magnitude * -collision.contacts[0].normal;
 
-	                    Debug.DrawRay(collidingObject.transform.position, collidingObject.getVelocity(), Color.blue);
-	                    Debug.DrawRay(transform.position, getVelocity(), Color.green);
-	                    Debug.DrawRay(collidingObject.transform.position, velocity2Final, Color.cyan);
-	                    Debug.DrawRay(transform.position, velocity1Final, Color.red);
-	                    //UnityEditor.EditorApplication.isPaused = true;
+                        Debug.DrawRay(collidingObject.transform.position, collidingObject.getVelocity(), Color.blue);
+                        Debug.DrawRay(transform.position, getVelocity(), Color.green);
+                        Debug.DrawRay(collidingObject.transform.position, velocity2Final, Color.cyan);
+                        Debug.DrawRay(transform.position, velocity1Final, Color.red);
+                        //UnityEditor.EditorApplication.isPaused = true;
 
-	                    setVelocity(velocity1Final);
-	                    collidingObject.setVelocity(velocity2Final);
-	// 
-	//                     collidingObject.setOnControllerColliderHitAlreadyCalled();
-					}
+                        setVelocity(velocity1Final);
+                        collidingObject.setVelocity(velocity2Final);
+                        // 
+                        //                     collidingObject.setOnControllerColliderHitAlreadyCalled();
+                    }
                 }
             }
         }
@@ -194,7 +198,7 @@ public class FlingableRock : MonoBehaviour
             rise();
             m_risingStarted = true;
         }
-        else if (!m_risingDone && !heightReached && fire)
+        else if (!m_risingDone && !heightReached && (!launcher && fire || launcher && fireCheat))
         {
             rise();
         }
@@ -215,9 +219,6 @@ public class FlingableRock : MonoBehaviour
             {
                 m_rigidBody.velocity = new Vector3(m_rigidBody.velocity.x, 0.0f, m_rigidBody.velocity.z);
 
-
-
-
                 /*Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
                 RaycastHit hit = new RaycastHit();
                 RaycastHit[] hitList = Physics.RaycastAll(ray, 5000);
@@ -235,9 +236,6 @@ public class FlingableRock : MonoBehaviour
                 m_forward = hit.point - transform.position;
                 m_forward.Normalize();*/
 				m_forward = m_launcher.getTarget();
-
-
-
 
                 m_forceTotal += m_forward * m_forceForward * getDistanceRatio();
                 stabilize();
@@ -334,6 +332,11 @@ public class FlingableRock : MonoBehaviour
 
     /*public void setUser(string _playerID)
     {
+        if (_playerID.Contains("FakePlayer"))
+        {
+            launcher = GameObject.Find(_playerID).GetComponent<BulletLauncher>();
+        }
+
         GameObject[] gos = GameObject.FindGameObjectsWithTag("Player");
 
 		foreach (GameObject go in gos)
@@ -413,12 +416,15 @@ public class FlingableRock : MonoBehaviour
 
     float getDistanceRatio()
     {
-		if (m_user == null) {
+        float ratio;
+        if (launcher)
+            ratio = launcher.m_OffsetForwardEarth / Vector3.Distance(transform.position, launcher.transform.position);
+		else if (m_user == null)
 			return 999f;
-		} else {
-	        float ratio = m_user.GetComponent<EarthAttack>().m_OffsetForwardEarth / Vector3.Distance(transform.position, m_user.transform.position);
-	        return Mathf.Min(4 * ratio, 1);
-		}
+        else
+	        ratio = m_user.GetComponent<EarthAttack>().m_OffsetForwardEarth / Vector3.Distance(transform.position, m_user.transform.position);
+        
+        return Mathf.Min(4 * ratio, 1);
     }
 
     float getDistanceRatio(CharacterMovementEarth _user)
@@ -426,7 +432,7 @@ public class FlingableRock : MonoBehaviour
         float ratio = _user.m_OffsetForwardEarth / Vector3.Distance(transform.position, _user.transform.position);
         return Mathf.Min(4 * ratio, 1);
     }
-
+    
     float getDistanceRatio(BulletLauncher _user)
     {
         float ratio = _user.m_OffsetForwardEarth / Vector3.Distance(transform.position, _user.transform.position);

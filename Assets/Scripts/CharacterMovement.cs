@@ -82,6 +82,14 @@ public class CharacterMovement : MonoBehaviour
                 return;
         }
 
+        if (m_tookAHit)
+        {
+            if (Input.GetButton("Jump"))
+                m_tookAHit = false;
+            else
+                return;
+        }
+
         // -------------------------------------Attack----------------------------------------------
         attack();
 
@@ -366,6 +374,24 @@ public class CharacterMovement : MonoBehaviour
     {
         m_tookAHit = true;
         m_velocityHit = _velocity;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        int toto = 0;
+        ++toto;
+    }
+
+    void OnCollisionStay(Collision collision)
+    {
+        int toto = 0;
+        ++toto;
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        int toto = 0;
+        ++toto;
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)

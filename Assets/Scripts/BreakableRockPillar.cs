@@ -20,11 +20,10 @@ public class BreakableRockPillar : BreakableRock
 
         m_forwardOut = (transform.forward + normal * opposite);
 
-        float y = m_size.y / 4 - m_baseSize.y;
-        float x = m_size.x / 4;
-        float z = m_size.z / 4;
-        float xz = Mathf.Sqrt(x * x + z * z);
-        transform.position -= m_forwardOut * Mathf.Sqrt(y * y + xz * xz);
+        moveTopAtPosition();
+
+//         m_previousPos[0] = transform.position;
+//         m_previousPos[1] = transform.position;
     }
 
     // Update is called once per frame
@@ -51,6 +50,15 @@ public class BreakableRockPillar : BreakableRock
     {
         //FIXME : Besoin d'avoir des mesh dont le scale est à 1 même si leur taille ne fait pas 1
         _gameObject.transform.localScale = transform.localScale;
+    }
+
+    protected override void moveTopAtPosition()
+    {
+        float y = m_size.y / 4 - m_baseSize.y;
+        float x = m_size.x / 4;
+        float z = m_size.z / 4;
+        float xz = Mathf.Sqrt(x * x + z * z);
+        transform.position -= m_forwardOut * Mathf.Sqrt(y * y + xz * xz);
     }
 
     public override void setVelocity(Vector3 _velocity)

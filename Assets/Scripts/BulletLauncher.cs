@@ -16,8 +16,6 @@ public class BulletLauncher : MonoBehaviour
     [SerializeField]
     float m_attack1ForceForward = 1000000;
 
-    AttackLauncher m_launcher;
-
     public float attackCD = 5;
     float attackCDCounter = 0;
 
@@ -35,10 +33,10 @@ public class BulletLauncher : MonoBehaviour
 
     void basicAttack1()
     {
-        //spawnAndFlingBullet("Cheat", m_attack1ForceUp, m_attack1ForceForward);
+        spawnAndFlingBullet("Cheat", m_attack1ForceUp, m_attack1ForceForward);
     }
 
-    void spawnAndFlingBullet(AttackLauncher _launcher, float _forceUp, float _forceForward)
+    void spawnAndFlingBullet(string _buttonToWatch, float _forceUp, float _forceForward)
     {
         Vector3 spawnProjectile = transform.position + transform.forward * m_OffsetForwardEarth;
         RaycastHit hit;
@@ -50,9 +48,9 @@ public class BulletLauncher : MonoBehaviour
             MeshRenderer meshRenderer = child.GetComponent<MeshRenderer>();
             spawnProjectile = hit.point - new Vector3(0, meshRenderer.bounds.extents.y, 0);
 
-            FlingableRock tmpBullet = ((GameObject)Instantiate(m_attackObject, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
-            tmpBullet.setUser(gameObject);
-            tmpBullet.init(_launcher, _forceUp, _forceForward);
+//             FlingableRock tmpBullet = ((GameObject)Instantiate(m_attackObject, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
+//             tmpBullet.setUser(m_username);
+//             tmpBullet.init(_buttonToWatch, _forceUp, _forceForward);
         }
     }
 }

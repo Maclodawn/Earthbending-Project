@@ -31,6 +31,9 @@ public class BreakableRock : MonoBehaviour
 
         m_boxCollider = transform.GetComponentInChildren<BoxCollider>();
 
+//         m_previousPos.Add(Vector3.zero);
+//         m_previousPos.Add(Vector3.zero);
+
         for (int i = 0; i < transform.childCount; ++i)
         {
             Transform tmpTransform = transform.GetChild(i);
@@ -49,6 +52,26 @@ public class BreakableRock : MonoBehaviour
         float volume = MeshVolumeHelper.VolumeOfObject(gameObject);
         // 2700 is the average density of a rock Cf. http://www.les-mathematiques.net/phorum/read.php?2,49845
         m_rigidBody.mass = volume * 2700;
+    }
+
+    void FixedUpdate()
+    {
+//         if (transform.position != m_previousPos[1])
+//         {
+//             Ray ray = new Ray(m_previousPos[1], transform.position - m_previousPos[1]);
+//             RaycastHit hit;
+//             if (Physics.Raycast(ray, out hit))
+//             {
+//                 Debug.DrawLine(m_previousPos[1], hit.point, Color.blue);
+//                 if (!hit.collider.gameObject.GetComponent<Terrain>())
+//                 {
+//                     // FIXME update position
+//                     transform.position = hit.point;
+//                     moveTopAtPosition();
+//                     myOnCollisionEnter(hit.collider.gameObject, hit.normal);
+//                 }
+//             }
+//         }
     }
 
     // Update is called once per frame
@@ -70,6 +93,9 @@ public class BreakableRock : MonoBehaviour
         {
             updateNotFrozenYet();
         }
+
+//         m_previousPos[1] = m_previousPos[0];
+//         m_previousPos[0] = transform.position;
     }
 
     protected virtual void updateNotFrozenYet()
@@ -125,6 +151,11 @@ public class BreakableRock : MonoBehaviour
     public float getMass()
     {
         return m_rigidBody.mass;
+    }
+
+    protected virtual void moveTopAtPosition()
+    {
+        //FIXME
     }
 
     void OnCollisionEnter(Collision collision)
