@@ -13,7 +13,7 @@ public class RockBulletAttack : EarthAttack {
 	// ---
 
 	protected override void updateMe() {
-		attack1();
+		basicAttack1();
 	}
 
 	protected override float WAIT_TIME() {
@@ -26,30 +26,51 @@ public class RockBulletAttack : EarthAttack {
 			  && myCurrentBullet.transform.position.y >= myCurrentBullet.getHeightToReach());
 	}
 
-	private void attack1() {
-		Collider[] colliders = Physics.OverlapSphere(transform.position, m_rangeToTakeBullet);
-		FlingableRock bullet = null;
-		
-		if (colliders.Length > 0)
-		{
-			bullet = findBullet(colliders);
-			if (!bullet)
-				spawnAndFlingBullet(GetComponent<AttackLauncher>(), m_attack1ForceUp, m_attack1ForceForward);
-			else
-			{
-//                 GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-//                 sphere.transform.position = transform.position;
-//                 sphere.transform.localScale = new Vector3(1, 1, 1) * m_rangeToTakeBullet;
-//                 sphere.GetComponent<SphereCollider>().enabled = false
-//                UnityEditor.EditorApplication.isPaused = true;
+	private void basicAttack1()
+    {
+        AttackLauncher atkLauncher = GetComponent<AttackLauncher>();
 
-				bullet.setUser(gameObject);
-				myCurrentBullet = bullet;
-				bullet.fling(GetComponent<AttackLauncher>(), m_attack1ForceUp, m_attack1ForceForward, false);
-			}
-		}
-		else
-			spawnAndFlingBullet(GetComponent<AttackLauncher>(), m_attack1ForceUp, m_attack1ForceForward);
+        Ray ray = atkLauncher.getAimRay();
+		RaycastHit hit;
+		bool collided = Physics.Raycast(ray, out hit, 5000);
+
+        BreakableRock breakableRock = null;
+        if (hit.collider)
+            breakableRock = hit.collider.GetComponentInParent<BreakableRock>();
+
+        if (Physics.Raycast(ray, out hit, 5000))
+        {
+            if (collided && breakableRock != null)
+            {
+                breakableRock.breakRock(gameObject, GetComponent<AttackLauncher>(), m_attack1ForceUp, m_attack1ForceForward);
+            }
+            else
+            {
+                Collider[] colliders = Physics.OverlapSphere(transform.position, m_rangeToTakeBullet);
+                FlingableRock bullet = null;
+
+                if (colliders.Length > 0)
+                {
+                    bullet = findBullet(colliders);
+                    if (!bullet)
+                        spawnAndFlingBullet(GetComponent<AttackLauncher>(), m_attack1ForceUp, m_attack1ForceForward);
+                    else
+                    {
+                        //                 GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                        //                 sphere.transform.position = transform.position;
+                        //                 sphere.transform.localScale = new Vector3(1, 1, 1) * m_rangeToTakeBullet;
+                        //                 sphere.GetComponent<SphereCollider>().enabled = false
+                        //                UnityEditor.EditorApplication.isPaused = true;
+
+                        bullet.setUser(gameObject);
+                        myCurrentBullet = bullet;
+                        bullet.fling(GetComponent<AttackLauncher>(), m_attack1ForceUp, m_attack1ForceForward, false);
+                    }
+                }
+                else
+                    spawnAndFlingBullet(GetComponent<AttackLauncher>(), m_attack1ForceUp, m_attack1ForceForward);
+            }
+        }
 	}
 
 	// ---

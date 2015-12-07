@@ -162,7 +162,7 @@ public class CharacterMovementEarth : CharacterMovement
 
     protected override void basicAttack2()
     {
-        Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
+        Ray ray = GetComponent<AttackLauncher>().getAimRay();
         RaycastHit hit = new RaycastHit();
         bool collided = Physics.Raycast(ray, out hit, 5000);
 
@@ -222,7 +222,7 @@ public class CharacterMovementEarth : CharacterMovement
 
     protected override void basicAttack3()
     {
-        Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
+        Ray ray = GetComponent<AttackLauncher>().getAimRay();
         RaycastHit hit;
         bool collided = Physics.Raycast(ray, out hit, 5000);
 
@@ -273,7 +273,7 @@ public class CharacterMovementEarth : CharacterMovement
 
     protected override void basicAttack4()
     {
-        Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
+        Ray ray = GetComponent<AttackLauncher>().getAimRay();
         RaycastHit hit;
         bool collided = Physics.Raycast(ray, out hit, 5000);
 

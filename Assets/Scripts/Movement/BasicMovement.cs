@@ -122,12 +122,6 @@ public abstract class BasicMovement : MonoBehaviour {
                 return;
         }
 
-        if (Input.GetKeyUp(KeyCode.Z))
-        {
-            int i = 0;
-            ++i;
-        }
-
 		m_currentMoveSpeed = (!crouch) ? m_runSpeed : m_crouchSpeed;
 		m_currentMoveSpeed = (!sprint) ? m_runSpeed : m_sprintSpeed;
 
@@ -225,24 +219,6 @@ public abstract class BasicMovement : MonoBehaviour {
     {
         m_tookAHit = true;
         m_velocityHit = _velocity;
-    }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        int toto = 0;
-        ++toto;
-    }
-
-    void OnCollisionStay(Collision collision)
-    {
-        int toto = 0;
-        ++toto;
-    }
-
-    void OnCollisionExit(Collision collision)
-    {
-        int toto = 0;
-        ++toto;
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)

@@ -18,25 +18,9 @@ public class HumanAttackLauncher : AttackLauncher {
 		return Input.GetButtonUp("Fire1");
 	}
 
-	public override Vector3 getTarget() {
+	public override Ray getAimRay() {
 		Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
-		RaycastHit hit = new RaycastHit();
-		RaycastHit[] hitList = Physics.RaycastAll(ray, 5000);
-		
-		// Do not take in account this.gameobject as aim
-		if (hitList.Length < 1)
-			hit.point = ray.direction * 5000;
-		else if (!hitList[0].collider.gameObject.name.Contains(gameObject.name))
-			hit = hitList[0];
-		else if (hitList.Length < 2)
-			hit.point = ray.direction * 5000;
-		else
-			hit = hitList[1];
-		
-		Vector3 m_forward = hit.point - transform.position;
-		m_forward.Normalize();
-
-		return m_forward;
+        return ray;
 	}
 
 	protected override void updateInput() {

@@ -62,8 +62,8 @@ public class FlingableRock : MonoBehaviour
     {
         updateSize();
         m_gravityForce = m_rigidBody.mass * Physics.gravity;
-        m_previousPos.Add(Vector3.zero);
-        m_previousPos.Add(Vector3.zero);
+        m_previousPos.Add(transform.position);
+        m_previousPos.Add(transform.position);
         if (m_alreadyInTheWorld)
             setStateAvailable();
     }
@@ -217,7 +217,7 @@ public class FlingableRock : MonoBehaviour
             {
                 m_rigidBody.velocity = new Vector3(m_rigidBody.velocity.x, 0.0f, m_rigidBody.velocity.z);
 
-                /*Ray ray = Camera.main.ScreenPointToRay(new Vector2((Screen.width / 2), (Screen.height / 2)));
+                Ray ray = m_user.GetComponent<AttackLauncher>().getAimRay();
                 RaycastHit hit = new RaycastHit();
                 RaycastHit[] hitList = Physics.RaycastAll(ray, 5000);
 
@@ -232,8 +232,7 @@ public class FlingableRock : MonoBehaviour
                     hit = hitList[1];
 
                 m_forward = hit.point - transform.position;
-                m_forward.Normalize();*/
-				m_forward = m_launcher.getTarget();
+                m_forward.Normalize();
 
                 m_forceTotal += m_forward * m_forceForward * getDistanceRatio();
                 stabilize();

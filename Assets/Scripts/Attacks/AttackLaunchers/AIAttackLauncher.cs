@@ -68,7 +68,7 @@ public class AIAttackLauncher : AttackLauncher {
 		return keyUp;
 	}
 
-	public override Vector3 getTarget() {
+	public override Ray getAimRay() {
 		if (frustum == null) frustum = GetComponent<CompositeFrustum>();
 
 		List<GameObject> visibles = frustum.GetObjects();
@@ -84,7 +84,7 @@ public class AIAttackLauncher : AttackLauncher {
 			target = transform.forward;
 		}
 
-		return target;
+		return new Ray(transform.position, target);
 	}
 
 	// ---
