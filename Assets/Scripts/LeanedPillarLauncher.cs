@@ -74,5 +74,7 @@ public class LeanedPillarLauncher : MonoBehaviour
         Quaternion rotation = xAndzRotation * yRotation;
 
         Instantiate(m_attackObject, hitGround.point, rotation);
+
+        //UnityEditor.EditorApplication.isPaused = true;
     }
 }

@@ -20,6 +20,8 @@ public class BreakableRock : MonoBehaviour
     [SerializeField]
     List<GameObject> m_pieceList;
 
+    //protected List<Vector3> m_previousPos = new List<Vector3>();
+
 #pragma warning disable 0414 // Assigned but never used as it is used only in children classes
     Transform m_base;
 #pragma warning restore 0414
@@ -30,6 +32,9 @@ public class BreakableRock : MonoBehaviour
         m_rigidBody = GetComponent<Rigidbody>();
 
         m_boxCollider = transform.GetComponentInChildren<BoxCollider>();
+
+//         m_previousPos.Add(Vector3.zero);
+//         m_previousPos.Add(Vector3.zero);
 
         for (int i = 0; i < transform.childCount; ++i)
         {
@@ -51,6 +56,26 @@ public class BreakableRock : MonoBehaviour
         m_rigidBody.mass = volume * 2700;
     }
 
+    void FixedUpdate()
+    {
+//         if (transform.position != m_previousPos[1])
+//         {
+//             Ray ray = new Ray(m_previousPos[1], transform.position - m_previousPos[1]);
+//             RaycastHit hit;
+//             if (Physics.Raycast(ray, out hit))
+//             {
+//                 Debug.DrawLine(m_previousPos[1], hit.point, Color.blue);
+//                 if (!hit.collider.gameObject.GetComponent<Terrain>())
+//                 {
+//                     // FIXME update position
+//                     transform.position = hit.point;
+//                     moveTopAtPosition();
+//                     myOnCollisionEnter(hit.collider.gameObject, hit.normal);
+//                 }
+//             }
+//         }
+    }
+
     // Update is called once per frame
     protected virtual void Update()
     {
@@ -70,6 +95,9 @@ public class BreakableRock : MonoBehaviour
         {
             updateNotFrozenYet();
         }
+
+//         m_previousPos[1] = m_previousPos[0];
+//         m_previousPos[0] = transform.position;
     }
 
     protected virtual void updateNotFrozenYet()
@@ -112,6 +140,11 @@ public class BreakableRock : MonoBehaviour
         // Do nothing
     }
 
+    protected virtual void moveTopAtPosition()
+    {
+        // FIXME
+    }
+
     public virtual void setVelocity(Vector3 _velocity)
     {
         m_rigidBody.velocity = _velocity;
@@ -130,29 +163,41 @@ public class BreakableRock : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         if (!collision.gameObject.GetComponent<Terrain>())
+            myOnCollisionEnter(collision.gameObject, collision.contacts[0].normal);
+    }
+
+    void myOnCollisionEnter(GameObject _gameObjectColliding, Vector3 normal)
+    {
+        if (!_gameObjectColliding.GetComponent<Rigidbody>())
         {
-            if (!collision.gameObject.GetComponent<Rigidbody>())
-            {
-                CharacterMovement collidingObject = collision.gameObject.GetComponent<CharacterMovement>();
-                Vector3 vect = getVelocity() - collidingObject.getVelocity();
+            CharacterMovement collidingObject = _gameObjectColliding.GetComponent<CharacterMovement>();
+            Vector3 vect = getVelocity() - collidingObject.getVelocity();
 
-                Vector3 velocity1Final = (collidingObject.m_mass / (getMass() + collidingObject.m_mass)) * vect;
-                velocity1Final = velocity1Final.magnitude * collision.contacts[0].normal;
+            Vector3 velocity1Final = (collidingObject.m_mass / (getMass() + collidingObject.m_mass)) * vect;
+            velocity1Final = velocity1Final.magnitude * normal;
 
-                Vector3 velocity2Final = (-getMass() / (getMass() + collidingObject.m_mass)) * vect;
-                velocity2Final = velocity2Final.magnitude * -collision.contacts[0].normal;
+            Vector3 velocity2Final = (-getMass() / (getMass() + collidingObject.m_mass)) * vect;
+            velocity2Final = velocity2Final.magnitude * -normal;
 
-//                 Debug.DrawRay(collidingObject.transform.position, collidingObject.getVelocity(), Color.blue);
-//                 Debug.DrawRay(transform.position, getVelocity(), Color.green);
-//                 Debug.DrawRay(collidingObject.transform.position, velocity2Final, Color.cyan);
-//                 Debug.DrawRay(transform.position, velocity1Final, Color.red);
-//                 UnityEditor.EditorApplication.isPaused = true;
+            //                 Debug.DrawRay(collidingObject.transform.position, collidingObject.getVelocity(), Color.blue);
+            //                 Debug.DrawRay(transform.position, getVelocity(), Color.green);
+            //                 Debug.DrawRay(collidingObject.transform.position, velocity2Final, Color.cyan);
+            //                 Debug.DrawRay(transform.position, velocity1Final, Color.red);
+            //                 UnityEditor.EditorApplication.isPaused = true;
 
-                setVelocity(velocity1Final);
-                collidingObject.setVelocity(velocity2Final);
-                // 
-                //                     collidingObject.setOnControllerColliderHitAlreadyCalled();
-            }
+            setVelocity(velocity1Final);
+            collidingObject.setVelocity(velocity2Final);
+            // 
+            //                     collidingObject.setOnControllerColliderHitAlreadyCalled();
+        }
+    }
+
+    void OnCollisionStay(Collision collision)
+    {
+        if (!collision.gameObject.GetComponent<Terrain>() && !collision.gameObject.GetComponent<Rigidbody>())
+        {
+            int i = 0;
+            ++i;
         }
     }
 }
