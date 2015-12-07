@@ -103,7 +103,7 @@ public class RockBulletAttack : EarthAttack {
         {
             FlingableRock flingableRock = colliders[closerOne].GetComponent<FlingableRock>();
 
-            if (flingableRock.canRiseInMinTime(0.30f, gameObject))
+            if (flingableRock.canRiseInMinTime(0.30f, gameObject, m_attack1ForceUp))
                 return flingableRock;
 
             return null;

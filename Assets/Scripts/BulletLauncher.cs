@@ -48,9 +48,9 @@ public class BulletLauncher : MonoBehaviour
             MeshRenderer meshRenderer = child.GetComponent<MeshRenderer>();
             spawnProjectile = hit.point - new Vector3(0, meshRenderer.bounds.extents.y, 0);
 
-//             FlingableRock tmpBullet = ((GameObject)Instantiate(m_attackObject, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
-//             tmpBullet.setUser(m_username);
-//             tmpBullet.init(_buttonToWatch, _forceUp, _forceForward);
+            FlingableRock tmpBullet = ((GameObject)Instantiate(m_attackObject, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
+            tmpBullet.setUser(m_username);
+            tmpBullet.init(null, _forceUp, _forceForward);
         }
     }
 }

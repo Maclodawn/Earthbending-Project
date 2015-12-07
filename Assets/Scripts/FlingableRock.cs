@@ -82,12 +82,14 @@ public class FlingableRock : MonoBehaviour
         m_risingDone = false;
         m_flingDone = false;
         m_isUnderground = true;
+        
         if (launcher)
             m_heightToReach = launcher.transform.position.y + m_size.y;
-        else if (m_user != null)
-			m_heightToReach = m_user.transform.position.y + m_size.y;
+        else if (m_launcher)
+            m_heightToReach = m_launcher.transform.position.y + m_size.y;
 		else
 			m_heightToReach = 1f + m_size.y;
+        
         m_forceUp = _forceUp;
         m_forceForward = _forceForward;
     }
@@ -104,54 +106,58 @@ public class FlingableRock : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit))
             {
-                //Debug.DrawLine(ray.origin, hit.point, Color.yellow);
-//                 GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-//                 go.transform.localScale /= 5;
-//                 go.transform.position = transform.position;
-//                 go.GetComponent<MeshRenderer>().material.color = Color.blue;
-//                 go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-//                 go.transform.localScale /= 5;
-//                 go.transform.position = m_previousPos[0];
-//                 go.GetComponent<MeshRenderer>().material.color = Color.cyan;
-//                 go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-//                 go.transform.localScale /= 5;
-//                 go.transform.position = m_previousPos[1];
-//                 go.GetComponent<MeshRenderer>().material.color = Color.green;
-//                 go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-//                 go.transform.localScale /= 5;
-//                 go.transform.position = hit.point;
-//                 go.GetComponent<MeshRenderer>().material.color = Color.yellow;
-                Vector3 newPos = hit.point - new Vector3(m_size.x * m_rigidBody.velocity.normalized.x / 2,
-                                                             m_size.y * m_rigidBody.velocity.normalized.y / 2,
-                                                             m_size.z * m_rigidBody.velocity.normalized.z / 2);
-                //Debug.DrawLine(hit.point, newPos, Color.white);
-                transform.position = newPos;
-                m_previousPos[0] = newPos;
-
-                
-                if (!collision.gameObject.GetComponent<Rigidbody>())
+                if (!hit.collider.GetComponent<Terrain>())
                 {
-                    CharacterMovement collidingObject = collision.gameObject.GetComponent<CharacterMovement>();
-                    if (collidingObject)
+//                     Debug.DrawLine(ray.origin, hit.point, Color.yellow);
+//                     GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+//                     go.transform.localScale /= 5;
+//                     go.transform.position = transform.position;
+//                     go.GetComponent<MeshRenderer>().material.color = Color.blue;
+//                     go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+//                     go.transform.localScale /= 5;
+//                     go.transform.position = m_previousPos[0];
+//                     go.GetComponent<MeshRenderer>().material.color = Color.cyan;
+//                     go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+//                     go.transform.localScale /= 5;
+//                     go.transform.position = m_previousPos[1];
+//                     go.GetComponent<MeshRenderer>().material.color = Color.green;
+//                     go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+//                     go.transform.localScale /= 5;
+//                     go.transform.position = hit.point;
+//                     go.GetComponent<MeshRenderer>().material.color = Color.yellow;
+//                     UnityEditor.EditorApplication.isPaused = true;
+                    Vector3 newPos = hit.point - new Vector3(m_size.x * m_rigidBody.velocity.normalized.x / 2,
+                                                                 m_size.y * m_rigidBody.velocity.normalized.y / 2,
+                                                                 m_size.z * m_rigidBody.velocity.normalized.z / 2);
+                    //Debug.DrawLine(hit.point, newPos, Color.white);
+                    transform.position = newPos;
+                    m_previousPos[0] = newPos;
+
+
+                    if (!collision.gameObject.GetComponent<Rigidbody>())
                     {
-                        Vector3 vect = getVelocity() - collidingObject.getVelocity();
+                        CharacterMovement collidingObject = collision.gameObject.GetComponent<CharacterMovement>();
+                        if (collidingObject)
+                        {
+                            Vector3 vect = getVelocity() - collidingObject.getVelocity();
 
-                        Vector3 velocity1Final = (collidingObject.m_mass / (getMass() + collidingObject.m_mass)) * vect;
-                        velocity1Final = velocity1Final.magnitude * collision.contacts[0].normal;
+                            Vector3 velocity1Final = (collidingObject.m_mass / (getMass() + collidingObject.m_mass)) * vect;
+                            velocity1Final = velocity1Final.magnitude * collision.contacts[0].normal;
 
-                        Vector3 velocity2Final = (-getMass() / (getMass() + collidingObject.m_mass)) * vect;
-                        velocity2Final = velocity2Final.magnitude * -collision.contacts[0].normal;
+                            Vector3 velocity2Final = (-getMass() / (getMass() + collidingObject.m_mass)) * vect;
+                            velocity2Final = velocity2Final.magnitude * -collision.contacts[0].normal;
 
-                        Debug.DrawRay(collidingObject.transform.position, collidingObject.getVelocity(), Color.blue);
-                        Debug.DrawRay(transform.position, getVelocity(), Color.green);
-                        Debug.DrawRay(collidingObject.transform.position, velocity2Final, Color.cyan);
-                        Debug.DrawRay(transform.position, velocity1Final, Color.red);
-                        //UnityEditor.EditorApplication.isPaused = true;
+                            Debug.DrawRay(collidingObject.transform.position, collidingObject.getVelocity(), Color.blue);
+                            Debug.DrawRay(transform.position, getVelocity(), Color.green);
+                            Debug.DrawRay(collidingObject.transform.position, velocity2Final, Color.cyan);
+                            Debug.DrawRay(transform.position, velocity1Final, Color.red);
+                            //UnityEditor.EditorApplication.isPaused = true;
 
-                        setVelocity(velocity1Final);
-                        collidingObject.setVelocity(velocity2Final);
-                        // 
-                        //                     collidingObject.setOnControllerColliderHitAlreadyCalled();
+                            setVelocity(velocity1Final);
+                            collidingObject.setVelocity(velocity2Final);
+                            // 
+                            //                     collidingObject.setOnControllerColliderHitAlreadyCalled();
+                        }
                     }
                 }
             }
@@ -172,7 +178,8 @@ public class FlingableRock : MonoBehaviour
             Destroy(this.gameObject);
         }
 
-		fire = m_launcher.isKey();
+        if (m_launcher)
+		    fire = m_launcher.isKey();
 
         m_forceTotal = m_gravityForce;
 
@@ -218,6 +225,8 @@ public class FlingableRock : MonoBehaviour
                 m_rigidBody.velocity = new Vector3(m_rigidBody.velocity.x, 0.0f, m_rigidBody.velocity.z);
 
                 Ray ray = m_user.GetComponent<AttackLauncher>().getAimRay();
+                Debug.DrawRay(ray.origin, ray.direction, Color.blue);
+                //UnityEditor.EditorApplication.isPaused = true;
                 RaycastHit hit = new RaycastHit();
                 RaycastHit[] hitList = Physics.RaycastAll(ray, 5000);
 
@@ -263,7 +272,7 @@ public class FlingableRock : MonoBehaviour
 
     bool isGrounded()
     {
-        return Physics.Raycast(m_collider.bounds.center, -Vector3.up, m_collider.bounds.extents.y + 0.1f);
+        return Physics.Raycast(m_collider.bounds.center, -Vector3.up, m_collider.bounds.extents.y + 0.01f);
     }
 
     bool isOnTheSameGroundOfTheUser()
@@ -284,14 +293,14 @@ public class FlingableRock : MonoBehaviour
         return false;
     }
 
-    bool isOnTheSameGroundOfTheUser(CharacterMovementEarth _user)
+    bool isOnTheSameGroundOfTheUser(GameObject _user)
     {
         RaycastHit hit;
         if (_user != null
             && Physics.Raycast(m_collider.bounds.center, -Vector3.up, out hit, m_collider.bounds.extents.y + 0.1f))
         {
             string thisName = hit.collider.gameObject.name;
-			GameObject currentGround = _user.getCurrentGround();
+			GameObject currentGround = _user.GetComponent<BasicMovement>().getCurrentGround();
 			if (currentGround == null) return false;
             string thatName = currentGround.name;
             //             Debug.Log("thisName=" + thisName);
@@ -333,29 +342,13 @@ public class FlingableRock : MonoBehaviour
 		m_user = user;
 	}
 
-    /*public void setUser(string _playerID)
+    public void setUser(string _playerID)
     {
         if (_playerID.Contains("FakePlayer"))
         {
             launcher = GameObject.Find(_playerID).GetComponent<BulletLauncher>();
         }
-
-        GameObject[] gos = GameObject.FindGameObjectsWithTag("Player");
-
-		foreach (GameObject go in gos)
-        {
-			if (go.GetComponent<CharacterMovement>() != null && go.GetComponent<CharacterMovement>().m_username.Equals(_playerID))
-            {
-				m_user = go.GetComponent<CharacterMovementEarth>();
-				break;
-			}
-        }
-    }*/
-
-	/*if (go.GetComponent<BasicAI>() != null && go.GetComponent<CharacterMovement>().m_username.Equals(_playerID)) {
-		m_user = go.GetComponent<CharacterMovementEarth>();
-		break;
-	}*/
+    }
 
     void updateSize()
     {
@@ -383,7 +376,7 @@ public class FlingableRock : MonoBehaviour
         }
         else
         {
-            MeshVolumeHelper.VolumeOfObject(gameObject);
+            volume = MeshVolumeHelper.VolumeOfObject(gameObject);
         }
         m_rigidBody.mass = volume * m_density;
     }
@@ -460,16 +453,16 @@ public class FlingableRock : MonoBehaviour
         launcher = null;
     }
 
-    public bool canRiseInMinTime(float timeToRise, GameObject user)
+    public bool canRiseInMinTime(float timeToRise, GameObject user, float _forceUp)
     {
-        if (!isOnTheSameGroundOfTheUser())
+        if (!isOnTheSameGroundOfTheUser(user))
             m_heightToReach = transform.position.y;
         else
             m_heightToReach = transform.position.y + m_size.y;
 
         int nbFrameToDo = (int) (timeToRise / Time.deltaTime);
         float timePerFrame = timeToRise / nbFrameToDo;
-        Vector3 force = m_gravityForce + Vector3.up * m_forceUp * getDistanceRatio(user);
+        Vector3 force = m_gravityForce + Vector3.up * _forceUp * getDistanceRatio(user);
         Vector3 acceleration = force / m_rigidBody.mass;
 
         float heightTraveled = 0;
