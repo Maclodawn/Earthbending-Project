@@ -46,7 +46,7 @@ public class HumanAttackLauncher : AttackLauncher {
 		
 		if (Input.GetButtonDown("Fire2")) {
 			if (Input.GetKey(KeyCode.S))
-				atk = 4;
+				atk = 1;
 			else if (Input.GetKey(KeyCode.Z))
 				atk = 2;
 			else
