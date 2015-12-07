@@ -38,8 +38,6 @@ public class Manager : MonoBehaviour
     [SerializeField]
     GameObject m_UI;
 
-    private bool m_cursorLocked;
-
     bool m_gameIsPaused = false;
 
     void Awake()
@@ -117,7 +115,6 @@ public class Manager : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        m_cursorLocked = true;
 
         m_UI.SetActive(true);
 

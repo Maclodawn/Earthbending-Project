@@ -3,32 +3,42 @@ using System.Collections;
 
 public abstract class AttackLauncher : MonoBehaviour {
 
-	private BasicAttack[] atks;
+	protected BasicAttack[] atks;
 	protected int atk = -1;
-	protected bool hold;
 
 	// map here type of attacks to ids
 	public void Start() {
 		atks = GetComponent<AttacksGetter>().getOrderedAttacks();
 	}
 
-	protected abstract void updateInput();
-
 	public void Update() {
 		updateInput();
-
-		if (atk < 0 || atk > atks.Length || isBusy()) return;
-
-		atks[atk].executeAttack();
-
-		atk = -1;
+		
+		if (atk >= atks.Length || isAnyBusy()) return;
+		
+		if ((atk == 0 && isKeyDown()) || atk > 0) {
+			atks[atk].executeAttack();
+		}
 	}
 
-	public bool BasicAtkOnHold() {
-		return atk == 0 && hold;
+	public int getAtk() {
+		return atk;
 	}
 
-	private bool isBusy() {
+	protected abstract void updateInput();
+
+	public abstract Ray getAimRay();
+
+	//the key is down since > 1 frame
+	public abstract bool isKey();
+	
+	//the key has just been pushed
+	public abstract bool isKeyDown();
+	
+	//the key has just been released
+	public abstract bool isKeyUp();
+
+	public bool isAnyBusy() {
 		foreach (BasicAttack a in atks) {
 			if (a.isBusy()) return true;
 		}

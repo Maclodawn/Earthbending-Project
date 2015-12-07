@@ -4,23 +4,17 @@ using System.Collections;
 public abstract class BasicAttack : MonoBehaviour {
 
 	protected bool icanexecute;
-	//protected CharacterBasic executer;
-
 	protected float timer = 0f;
-
-	public void Start() {
-		//executer = GetComponent<CharacterBasic>();
-	}
 
 	public void Update() {
 		if (timer < WAIT_TIME())
 			timer += Time.deltaTime;
-
+		
 		if (!icanexecute || isBusy())
 			return;
-
+		
 		updateMe();
-
+		
 		icanexecute = false;
 		timer = 0f;
 	}
@@ -31,6 +25,10 @@ public abstract class BasicAttack : MonoBehaviour {
 
 	public bool isBusy() {
 		return timer < WAIT_TIME();
+	}
+
+	public virtual bool isFinished() {
+		return true;
 	}
 
 	protected abstract void updateMe();

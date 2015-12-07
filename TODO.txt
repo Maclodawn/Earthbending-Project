@@ -9,8 +9,8 @@
 |	   |__/   \______/ |_______/  \______/ 	|
 \*=========================================*/
 EarthBending :
-	- Slow down rock until it stops if trying to bend a rock coming towards us
 	- Blow apart rocks once colliding
+	
 	- Super jump if pressing (wheel click + jump)
 	- Bigger forces applied to rocks when landing after a super jump if pressing (left click)
 	- Bigger pillar going out when landing after a super jump if pressing (wheel click)

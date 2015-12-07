@@ -2,32 +2,21 @@
 using System.Collections;
 using System.Collections.Generic;
 
-//@deprecated
+public class CompositeFrustum : MonoBehaviour {
 
-public class BasicAI : MonoBehaviour {
-	
-	//private BasicAttack attack1;
-	
 	private Frustum[] frustums;
 	private List<GameObject> objects;
 
-	// ---
-	
 	public void Start() {
 		frustums = GetComponentsInChildren<Frustum>();
 		objects = new List<GameObject>();
-		//attack1 = GetComponent<BasicRockBulletAttack>();
 	}
-	
-	public void Update() {
+
+	public List<GameObject> GetObjects() {
 		UpdateFrustum();
-
-		//if (objects.Count > 0 && !IsFriend(objects[0]))
-			//attack1.executeAttack(); //TODO: give target position
+		return objects;
 	}
 
-	// ---
-	
 	private void UpdateFrustum() {
 		if (frustums == null || frustums.Length == 0) return;
 		
@@ -39,9 +28,7 @@ public class BasicAI : MonoBehaviour {
 			}
 		}
 	}
-	
-	// be careful, if center node of objects are not visible, it is not visible
-	// main interest: detect if another AI is visible or not
+
 	private bool IsVisible(GameObject o) {
 		Vector3 origin = transform.position; //better use head position
 		Vector3 direction = (o.transform.position - transform.position);
@@ -54,8 +41,7 @@ public class BasicAI : MonoBehaviour {
 		return hit.collider.gameObject == o;
 	}
 
-	//TODO do something...
-	private bool IsFriend(GameObject o) {
-		return o.GetComponent<BasicAI>() == null && o.GetComponent<CharacterMovement>() == null;
-	}
+	/*private bool IsFriend(GameObject o) {
+		return o.GetComponent<AttackLauncher>() == null && o.GetComponent<CharacterMovement>() == null;
+	}*/
 }

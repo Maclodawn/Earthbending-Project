@@ -5,39 +5,72 @@ using System.Collections.Generic;
 public class RockBulletAttack : EarthAttack {
 
 	public GameObject rockBullet;
-
+	public FlingableRock myCurrentBullet;
+	
     [SerializeField]
     float m_rangeToTakeBullet = 15.0f;
 	
 	// ---
 
 	protected override void updateMe() {
-		attack1();
+		basicAttack1();
 	}
 
 	protected override float WAIT_TIME() {
 		return 0.3f;
 	}
 
-	// ---
+	public override bool isFinished() {
+		return myCurrentBullet == null ||
+			  (myCurrentBullet != null
+			  && myCurrentBullet.transform.position.y >= myCurrentBullet.getHeightToReach());
+	}
 
-	private void attack1() {
-		Collider[] colliders = Physics.OverlapSphere(transform.position, m_rangeToTakeBullet);
-		FlingableRock bullet = null;
-		
-		if (colliders.Length > 0)
-		{
-			bullet = findBullet(colliders);
-			if (!bullet)
-				spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
-			else
-			{
-				bullet.setUser(gameObject);
-				bullet.fling("Fire1", m_attack1ForceUp, m_attack1ForceForward, false);
-			}
-		}
-		else
-			spawnAndFlingBullet("Fire1", m_attack1ForceUp, m_attack1ForceForward);
+	private void basicAttack1()
+    {
+        AttackLauncher atkLauncher = GetComponent<AttackLauncher>();
+
+        Ray ray = atkLauncher.getAimRay();
+		RaycastHit hit;
+		bool collided = Physics.Raycast(ray, out hit, 5000);
+
+        BreakableRock breakableRock = null;
+        if (hit.collider)
+            breakableRock = hit.collider.GetComponentInParent<BreakableRock>();
+
+        if (Physics.Raycast(ray, out hit, 5000))
+        {
+            if (collided && breakableRock != null)
+            {
+                breakableRock.breakRock(gameObject, GetComponent<AttackLauncher>(), m_attack1ForceUp, m_attack1ForceForward);
+            }
+            else
+            {
+                Collider[] colliders = Physics.OverlapSphere(transform.position, m_rangeToTakeBullet);
+                FlingableRock bullet = null;
+
+                if (colliders.Length > 0)
+                {
+                    bullet = findBullet(colliders);
+                    if (!bullet)
+                        spawnAndFlingBullet(GetComponent<AttackLauncher>(), m_attack1ForceUp, m_attack1ForceForward);
+                    else
+                    {
+                        //                 GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                        //                 sphere.transform.position = transform.position;
+                        //                 sphere.transform.localScale = new Vector3(1, 1, 1) * m_rangeToTakeBullet;
+                        //                 sphere.GetComponent<SphereCollider>().enabled = false
+                        //                UnityEditor.EditorApplication.isPaused = true;
+
+                        bullet.setUser(gameObject);
+                        myCurrentBullet = bullet;
+                        bullet.fling(GetComponent<AttackLauncher>(), m_attack1ForceUp, m_attack1ForceForward, false);
+                    }
+                }
+                else
+                    spawnAndFlingBullet(GetComponent<AttackLauncher>(), m_attack1ForceUp, m_attack1ForceForward);
+            }
+        }
 	}
 
 	// ---
@@ -67,10 +100,17 @@ public class RockBulletAttack : EarthAttack {
 		if (closerOne == -1)
 			return null;
 		else
-			return colliders[closerOne].GetComponent<FlingableRock>();
+        {
+            FlingableRock flingableRock = colliders[closerOne].GetComponent<FlingableRock>();
+
+            if (flingableRock.canRiseInMinTime(0.30f, gameObject, m_attack1ForceUp))
+                return flingableRock;
+
+            return null;
+        }
 	}
 	
-	private void spawnAndFlingBullet(string _buttonToWatch, float _forceUp, float _forceForward) {
+	private void spawnAndFlingBullet(AttackLauncher _launcher, float _forceUp, float _forceForward) {
 		Vector3 spawnProjectile = transform.position + transform.forward * m_OffsetForwardEarth;
 		RaycastHit hit;
 		if (Physics.Raycast(spawnProjectile, -Vector3.up, out hit, 50))
@@ -84,7 +124,8 @@ public class RockBulletAttack : EarthAttack {
 			
 			FlingableRock tmpBullet = ((GameObject)Instantiate(rockBullet, spawnProjectile, Quaternion.identity)).GetComponent<FlingableRock>();
 			tmpBullet.setUser(gameObject);
-			tmpBullet.init(_buttonToWatch, _forceUp, _forceForward);
+			myCurrentBullet = tmpBullet;
+			tmpBullet.init(_launcher, _forceUp, _forceForward);
 		}
 	}
 }
