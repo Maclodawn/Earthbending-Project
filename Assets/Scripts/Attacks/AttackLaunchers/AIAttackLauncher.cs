@@ -79,9 +79,14 @@ public class AIAttackLauncher : AttackLauncher {
 
 		if (visibles.Count > 0) {
 			target = (visibles[0].gameObject.transform.position - gameObject.transform.position).normalized;
-			transform.LookAt(transform.position + target);
+			transform.LookAt(transform.position + (new Vector3(target.x, 0f, target.z)).normalized);
 		} else {
 			target = transform.forward;
+		}
+
+		if (atk != 1 && atk != 0) {
+			target += Vector3.down;
+			target.Normalize();
 		}
 
 		return new Ray(transform.position, target);
@@ -91,6 +96,19 @@ public class AIAttackLauncher : AttackLauncher {
 	
 	protected override void updateInput() {
 		//AI thinking here
+		/*int tmp_atk = Random.Range(0, 16);
+
+		if (atk == 0) {
+			tmp_atk = 0;
+		} else {
+			if (tmp_atk > 12) tmp_atk = 3;
+			else if (tmp_atk > 9) tmp_atk = 2;
+			else if (tmp_atk > 6) tmp_atk = 1;
+			else tmp_atk = 0;
+
+			atk = (tmp_atk != 0) ? -1 : 0;
+		}*/
+
 		int tmp_atk = 0;
 
 		if (tmp_atk == 0) {
@@ -114,7 +132,7 @@ public class AIAttackLauncher : AttackLauncher {
 
 			if (keyUp || !key)
 				timer += Time.deltaTime;
-		} else {
+		} else if (atk != 0) {
 			atk = tmp_atk;
 		}
 	}
