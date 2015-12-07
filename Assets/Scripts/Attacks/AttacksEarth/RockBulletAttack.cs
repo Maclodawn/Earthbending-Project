@@ -37,6 +37,12 @@ public class RockBulletAttack : EarthAttack {
 				spawnAndFlingBullet(GetComponent<AttackLauncher>(), m_attack1ForceUp, m_attack1ForceForward);
 			else
 			{
+//                 GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+//                 sphere.transform.position = transform.position;
+//                 sphere.transform.localScale = new Vector3(1, 1, 1) * m_rangeToTakeBullet;
+//                 sphere.GetComponent<SphereCollider>().enabled = false
+//                UnityEditor.EditorApplication.isPaused = true;
+
 				bullet.setUser(gameObject);
 				myCurrentBullet = bullet;
 				bullet.fling(GetComponent<AttackLauncher>(), m_attack1ForceUp, m_attack1ForceForward, false);
@@ -73,7 +79,14 @@ public class RockBulletAttack : EarthAttack {
 		if (closerOne == -1)
 			return null;
 		else
-			return colliders[closerOne].GetComponent<FlingableRock>();
+        {
+            FlingableRock flingableRock = colliders[closerOne].GetComponent<FlingableRock>();
+
+            if (flingableRock.canRiseInMinTime(0.30f, gameObject))
+                return flingableRock;
+
+            return null;
+        }
 	}
 	
 	private void spawnAndFlingBullet(AttackLauncher _launcher, float _forceUp, float _forceForward) {

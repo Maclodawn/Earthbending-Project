@@ -135,8 +135,8 @@ public class CharacterMovementEarth : CharacterMovement
         {
             FlingableRock flingableRock = colliderList[closerOne].GetComponent<FlingableRock>();
 
-            if (flingableRock.canRiseInMinTime(0.30f, this))
-                return flingableRock;
+//             if (flingableRock.canRiseInMinTime(0.30f, this))
+//                 return flingableRock;
 
             return null;
         }

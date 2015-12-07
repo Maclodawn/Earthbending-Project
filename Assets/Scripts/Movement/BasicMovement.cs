@@ -32,14 +32,26 @@ public abstract class BasicMovement : MonoBehaviour {
 	public float m_cooldownBeforeDodge = 1;			// temps à attendre avant de dodge
 	protected float m_cooldownBeforeDodgeTimer = 1;	// temps qui s'est écoulé depuis dernier dodge
 	protected bool m_ableToDodge = true;			// savoir si on peut dodge
-	
-	// ---
+
+    protected bool m_pause;
+
+    protected Collider m_collider;
+
+    bool m_tookAHit = false;
+    Vector3 m_velocityHit;
+    [SerializeField]
+    float m_speedFrictionHit;
+    
+    //    bool m_onControllerColliderHitAlreadyCalled = false;
+
+    // ---
 	
 	public void Start() {
 		m_controller = GetComponent<CharacterController>();
-		m_currentMoveSpeed = m_runSpeed;
+        m_collider = GetComponent<Collider>();
+        m_currentMoveSpeed = m_runSpeed;
 		m_smoothMovementDodge = m_smoothMovement;
-	}
+    }
 
 	public void Update() {
 		updateInput();
@@ -47,17 +59,69 @@ public abstract class BasicMovement : MonoBehaviour {
 	}
 
 	public void FixedUpdate() {
-		if (launcher == null) launcher = GetComponent<AttackLauncher>();
-		if (launcher.isAnyBusy()) return;
+        if (m_pause)
+            return;
+
+//        m_onControllerColliderHitAlreadyCalled = false;
+
+		if (launcher == null)
+            launcher = GetComponent<AttackLauncher>();
+		if (launcher.isAnyBusy())
+            return;
 
 		Vector3 direction = transform.forward * m_forwardSpeed + transform.right * m_rightSpeed;
 		direction.y = m_yVelocity;
-		m_controller.Move(direction * Time.deltaTime);
+        m_controller.Move(direction * Time.fixedDeltaTime);
+
+        // --------------------------------------------Take a hit --------------------------------------------------
+        if (!m_tookAHit)
+            return;
+
+        Vector3 speed = m_velocityHit;
+
+        if (m_controller.isGrounded)
+        {
+            m_yVelocity = 0;
+            m_velocityHit.y = 0;
+        }
+        else
+            m_yVelocity -= m_gravity;
+
+        speed += Vector3.up * m_yVelocity;
+
+        if (m_controller.isGrounded && m_speedFrictionHit != 0)
+        {
+            Vector3 friction = -speed.normalized * m_speedFrictionHit;
+            if (Mathf.Sign(speed.x + friction.x) != Mathf.Sign(speed.x))
+                speed = Vector3.zero;
+            else
+            {
+                speed += friction;
+                m_velocityHit += friction;
+            }
+        }
+
+        if (speed.magnitude < 1)
+            m_tookAHit = false;
+
+        m_controller.Move(speed * Time.fixedDeltaTime);
+        // --------------------------------------------End take a hit --------------------------------------------------
 	}
 
 	protected abstract void updateInput();
 
 	protected void workFromInput() {
+        if (m_pause)
+            return;
+
+        if (m_tookAHit)
+        {
+            if (jump)
+                m_tookAHit = false;
+            else
+                return;
+        }
+
 		m_currentMoveSpeed = (!crouch) ? m_runSpeed : m_crouchSpeed;
 		m_currentMoveSpeed = (!sprint) ? m_runSpeed : m_sprintSpeed;
 
@@ -132,4 +196,75 @@ public abstract class BasicMovement : MonoBehaviour {
 		else
 			return null;
 	}
+
+    public void ReceiveMessage(object msg)
+    {
+        string str = msg as string;
+        if (str != null)
+        {
+            if (str == "Pause")
+                m_pause = true;
+            else if (str == "UnPause")
+                m_pause = false;
+        }
+    }
+
+    public Vector3 getVelocity()
+    {
+        //return transform.forward * m_forwardSpeed + transform.right * m_rightSpeed + Vector3.up * m_yVelocity;
+        return m_controller.velocity;
+    }
+
+    public void setVelocity(Vector3 _velocity)
+    {
+        m_tookAHit = true;
+        m_velocityHit = _velocity;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        int toto = 0;
+        ++toto;
+    }
+
+    void OnCollisionStay(Collision collision)
+    {
+        int toto = 0;
+        ++toto;
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        int toto = 0;
+        ++toto;
+    }
+
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (!hit.collider.gameObject.GetComponent<Terrain>())
+        {
+            int i = 0;
+            i++;
+        }
+        //         if (!hit.collider.gameObject.GetComponent<Terrain>() && !m_onControllerColliderHitAlreadyCalled)
+        //         {
+        //             throw new System.Exception("OnControllerColliderHit call from CharacterController");
+        //             FlingableRock collidingObject = hit.collider.gameObject.GetComponent<FlingableRock>();
+        //             Vector3 vect = collidingObject.getVelocity() - getVelocity();
+        // 
+        //             Vector3 velocity1Final = (m_mass / (collidingObject.getMass() + m_mass)) * vect;
+        //             velocity1Final = velocity1Final.magnitude * hit.normal;
+        // 
+        //             Vector3 velocity2Final = (-collidingObject.getMass() / (collidingObject.getMass() + m_mass)) * vect;
+        //             velocity2Final = velocity2Final.magnitude * -hit.normal;
+        // 
+        //             collidingObject.setVelocity(velocity1Final);
+        //             setVelocity(velocity2Final);
+        //         }
+    }
+    // 
+    //     public void setOnControllerColliderHitAlreadyCalled()
+    //     {
+    //         m_onControllerColliderHitAlreadyCalled = true;
+    //     }
 }

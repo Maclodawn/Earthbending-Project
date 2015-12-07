@@ -82,14 +82,6 @@ public class CharacterMovement : MonoBehaviour
                 return;
         }
 
-        if (m_tookAHit)
-        {
-            if (Input.GetButton("Jump"))
-                m_tookAHit = false;
-            else
-                return;
-        }
-
         // -------------------------------------Attack----------------------------------------------
         attack();
 

@@ -427,9 +427,9 @@ public class FlingableRock : MonoBehaviour
         return Mathf.Min(4 * ratio, 1);
     }
 
-    float getDistanceRatio(CharacterMovementEarth _user)
+    float getDistanceRatio(GameObject _user)
     {
-        float ratio = _user.m_OffsetForwardEarth / Vector3.Distance(transform.position, _user.transform.position);
+        float ratio = _user.GetComponent<EarthAttack>().m_OffsetForwardEarth / Vector3.Distance(transform.position, _user.transform.position);
         return Mathf.Min(4 * ratio, 1);
     }
     
@@ -449,7 +449,7 @@ public class FlingableRock : MonoBehaviour
         launcher = null;
     }
 
-    public bool canRiseInMinTime(float timeToRise, CharacterMovementEarth user)
+    public bool canRiseInMinTime(float timeToRise, GameObject user)
     {
         if (!isOnTheSameGroundOfTheUser())
             m_heightToReach = transform.position.y;
