@@ -235,7 +235,25 @@ public class CharacterMovementEarth : CharacterMovement
             }
             else
             {
-                Quaternion rotation = Quaternion.FromToRotation(transform.up, hit.normal) * Quaternion.FromToRotation(m_attack3Object.transform.forward, transform.forward);
+                Quaternion xAndzRotation;
+                if (transform.up == Vector3.up || transform.up == -Vector3.up)
+                    xAndzRotation = Quaternion.FromToRotation(transform.up + Vector3.forward * 0.01f, hit.normal + Vector3.forward * 0.01f);
+                else if (transform.up == Vector3.right || transform.up == -Vector3.right
+                         || transform.up == Vector3.forward || transform.up == -Vector3.forward)
+                    xAndzRotation = Quaternion.FromToRotation(transform.up + Vector3.up * 0.01f, hit.normal + Vector3.up * 0.01f);
+                else
+                    xAndzRotation = Quaternion.FromToRotation(transform.up, hit.normal);
+
+                Quaternion yRotation;
+                if (transform.forward == Vector3.forward || transform.forward == -Vector3.forward)
+                    yRotation = Quaternion.FromToRotation(m_attack3Object.transform.forward + Vector3.right * 0.01f, transform.forward + Vector3.right * 0.01f);
+                else if (transform.forward == Vector3.right || transform.forward == -Vector3.right
+                         || transform.forward == Vector3.up || transform.forward == -Vector3.up)
+                    yRotation = Quaternion.FromToRotation(m_attack3Object.transform.forward + Vector3.forward * 0.01f, transform.forward + Vector3.forward * 0.01f);
+                else
+                    yRotation = Quaternion.FromToRotation(m_attack3Object.transform.forward, transform.forward);
+
+                Quaternion rotation = xAndzRotation * yRotation;
                 Vector3 newDirection = rotation * m_attack3Object.transform.up;
 
                 float ySize = 0;

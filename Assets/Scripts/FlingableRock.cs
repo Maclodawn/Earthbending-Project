@@ -127,24 +127,27 @@ public class FlingableRock : MonoBehaviour
                 if (!collision.gameObject.GetComponent<Rigidbody>())
                 {
                     CharacterMovement collidingObject = collision.gameObject.GetComponent<CharacterMovement>();
-                    Vector3 vect = getVelocity() - collidingObject.getVelocity();
+                    if (collidingObject)
+                    {
+                        Vector3 vect = getVelocity() - collidingObject.getVelocity();
 
-                    Vector3 velocity1Final = (collidingObject.m_mass / (getMass() + collidingObject.m_mass)) * vect;
-                    velocity1Final = velocity1Final.magnitude * collision.contacts[0].normal;
+                        Vector3 velocity1Final = (collidingObject.m_mass / (getMass() + collidingObject.m_mass)) * vect;
+                        velocity1Final = velocity1Final.magnitude * collision.contacts[0].normal;
 
-                    Vector3 velocity2Final = (-getMass() / (getMass() + collidingObject.m_mass)) * vect;
-                    velocity2Final = velocity2Final.magnitude * -collision.contacts[0].normal;
+                        Vector3 velocity2Final = (-getMass() / (getMass() + collidingObject.m_mass)) * vect;
+                        velocity2Final = velocity2Final.magnitude * -collision.contacts[0].normal;
 
-                    Debug.DrawRay(collidingObject.transform.position, collidingObject.getVelocity(), Color.blue);
-                    Debug.DrawRay(transform.position, getVelocity(), Color.green);
-                    Debug.DrawRay(collidingObject.transform.position, velocity2Final, Color.cyan);
-                    Debug.DrawRay(transform.position, velocity1Final, Color.red);
-                    //UnityEditor.EditorApplication.isPaused = true;
+                        Debug.DrawRay(collidingObject.transform.position, collidingObject.getVelocity(), Color.blue);
+                        Debug.DrawRay(transform.position, getVelocity(), Color.green);
+                        Debug.DrawRay(collidingObject.transform.position, velocity2Final, Color.cyan);
+                        Debug.DrawRay(transform.position, velocity1Final, Color.red);
+                        //UnityEditor.EditorApplication.isPaused = true;
 
-                    setVelocity(velocity1Final);
-                    collidingObject.setVelocity(velocity2Final);
-// 
-//                     collidingObject.setOnControllerColliderHitAlreadyCalled();
+                        setVelocity(velocity1Final);
+                        collidingObject.setVelocity(velocity2Final);
+                        // 
+                        //                     collidingObject.setOnControllerColliderHitAlreadyCalled();
+                    }
                 }
             }
         }
