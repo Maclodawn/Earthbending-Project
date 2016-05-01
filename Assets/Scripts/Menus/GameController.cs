@@ -201,7 +201,7 @@ public class GameController : MonoBehaviour {
         Debug.Log("Click command is: " + command);
         if(command == "Start")
         {
-            Application.LoadLevel("Main");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("Main");
         }
 
         if(command == "Exit")
@@ -237,7 +237,7 @@ public class GameController : MonoBehaviour {
 
         if(command == "LoadMap")
         {
-            Application.LoadLevel(MapName.text);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(MapName.text);
         }
     }
 

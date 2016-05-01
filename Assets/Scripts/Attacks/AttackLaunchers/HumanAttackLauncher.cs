@@ -31,11 +31,12 @@ public class HumanAttackLauncher : AttackLauncher {
 		if (Input.GetButtonDown("Fire1")) {
 			atk = 0;
 		}
-		
-		if (Input.GetButtonDown("Fire2")) {
-			if (Input.GetKey(KeyCode.S))
+
+        if (Input.GetButtonDown("Fire2"))
+        {
+            if (Input.GetAxis("Vertical") < 0)
 				atk = 1;
-			else if (Input.GetKey(KeyCode.Z))
+            else if (Input.GetAxis("Vertical") > 0)
 				atk = 2;
 			else
 				atk = 3;

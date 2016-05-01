@@ -328,11 +328,12 @@ public class CharacterMovement : MonoBehaviour
             if (Input.GetButtonDown("Fire1"))
                 basicAttack1();
 
+            print("Vertical=" + Input.GetAxis("Vertical"));
             if (Input.GetButtonDown("Fire2"))
             {
-                if (Input.GetKey(KeyCode.S))
+                if (Input.GetAxis("Vertical") > 0)
                     basicAttack4();
-                else if (Input.GetKey(KeyCode.Z))
+                else if (Input.GetAxis("Vertical") < 0)
                     basicAttack2();
                 else
                     basicAttack3();

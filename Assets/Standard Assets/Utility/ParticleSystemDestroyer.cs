@@ -41,7 +41,8 @@ namespace UnityStandardAssets.Utility
             // turn off emission
             foreach (var system in systems)
             {
-                system.enableEmission = false;
+                UnityEngine.ParticleSystem.EmissionModule em = system.emission;
+                em.enabled = false;
             }
             BroadcastMessage("Extinguish", SendMessageOptions.DontRequireReceiver);
 

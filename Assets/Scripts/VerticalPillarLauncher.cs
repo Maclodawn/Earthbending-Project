@@ -66,6 +66,6 @@ public class VerticalPillarLauncher : MonoBehaviour
         Vector3 vect = newDirection * ySize / 2.0f;
         Instantiate(m_attackObject, hitGround.point - vect, rotation);
 
-        UnityEditor.EditorApplication.isPaused = true;
+        //UnityEditor.EditorApplication.isPaused = true;
     }
 }

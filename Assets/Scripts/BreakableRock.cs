@@ -77,7 +77,7 @@ public class BreakableRock : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKeyDown(KeyCode.Z))
         {
             Destroy(this.gameObject);
         }

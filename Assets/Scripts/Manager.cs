@@ -94,7 +94,7 @@ public class Manager : MonoBehaviour
         if (command == "ExitToMainMenu")
         {
             Time.timeScale = 1;
-            Application.LoadLevel("Menu");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("Menu");
         }
     }
 
